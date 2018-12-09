@@ -15,18 +15,25 @@ const aws4_1 = __importDefault(require("aws4"));
 const axios_1 = __importDefault(require("axios"));
 const url_1 = require("url");
 const aws_sdk_1 = require("aws-sdk");
+const config_1 = __importDefault(require("./config"));
 class ChainOps {
-    constructor() {
-        this.ORACLE_URL = 'https://s3-ap-southeast-2.amazonaws.com/chainops-oracle-production-history-store/';
-        this.SUBSCRIPTIONS_ENDPOINT = 'https://pxzea0vim3.execute-api.ap-southeast-2.amazonaws.com/mainnet';
+    constructor(env) {
         this.awsConfig = new aws_sdk_1.Config();
         this.awsConfig.credentials = new aws_sdk_1.SharedIniFileCredentials();
+        if (typeof env === 'string') {
+            console.log('Setting config from env:', env);
+            this.config = config_1.default[env];
+        }
+        else {
+            console.log('Setting config from object:', env);
+            this.config = env;
+        }
     }
     getGasPrice(blockNumber) {
         return __awaiter(this, void 0, void 0, function* () {
             const file = `${blockNumber || 'latest'}.json`;
             const response = yield axios_1.default.request({
-                baseURL: this.ORACLE_URL,
+                baseURL: this.config.ORACLE_URL,
                 url: file
             });
             try {
@@ -39,7 +46,7 @@ class ChainOps {
     }
     subscribe(subConfig) {
         return __awaiter(this, void 0, void 0, function* () {
-            const url = new url_1.URL(this.SUBSCRIPTIONS_ENDPOINT + '/subscription');
+            const url = new url_1.URL(this.config.SUBSCRIPTIONS_ENDPOINT + '/subscription');
             //@ts-ignore
             yield this.awsConfig.credentials.getPromise();
             if (!this.awsConfig.credentials)
@@ -70,7 +77,7 @@ class ChainOps {
     }
     unsubscribe(subscriptionId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const url = new url_1.URL(this.SUBSCRIPTIONS_ENDPOINT + '/subscription/' + subscriptionId);
+            const url = new url_1.URL(this.config.SUBSCRIPTIONS_ENDPOINT + '/subscription/' + subscriptionId);
             //@ts-ignore
             yield this.awsConfig.credentials.getPromise();
             if (!this.awsConfig.credentials)

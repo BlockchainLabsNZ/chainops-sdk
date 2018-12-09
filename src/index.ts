@@ -3,21 +3,30 @@ import axios from 'axios';
 import {URL} from 'url';
 import {SharedIniFileCredentials, Config} from 'aws-sdk';
 
-import config from './config';
+import config, { IConfig } from './config';
 
 export class ChainOps {
     awsConfig: Config;
+    config: IConfig;
 
-    constructor () {
+    constructor (env: string | IConfig) {
         this.awsConfig = new Config();
         this.awsConfig.credentials = new SharedIniFileCredentials();
+
+        if (typeof env === 'string') {
+            console.log('Setting config from env:', env);
+            this.config = config[env];
+        }else{
+            console.log('Setting config from object:', env);
+            this.config = env;
+        }
     }
 
     async getGasPrice (blockNumber?: number) {
         const file = `${blockNumber || 'latest'}.json`;
 
         const response = await axios.request({
-            baseURL: config.ORACLE_URL,
+            baseURL: this.config.ORACLE_URL,
             url: file
         });
 
@@ -29,7 +38,7 @@ export class ChainOps {
     }
     
     async subscribe (subConfig: any) {
-        const url = new URL(config.SUBSCRIPTIONS_ENDPOINT + '/subscription');
+        const url = new URL(this.config.SUBSCRIPTIONS_ENDPOINT + '/subscription');
         
         //@ts-ignore
         await this.awsConfig.credentials.getPromise();
@@ -62,7 +71,7 @@ export class ChainOps {
     }
 
     async unsubscribe (subscriptionId: string) {
-        const url = new URL(config.SUBSCRIPTIONS_ENDPOINT + '/subscription/' + subscriptionId);
+        const url = new URL(this.config.SUBSCRIPTIONS_ENDPOINT + '/subscription/' + subscriptionId);
 
         //@ts-ignore
         await this.awsConfig.credentials.getPromise();
