@@ -6,12 +6,15 @@ import { SharedIniFileCredentials, Config } from 'aws-sdk'
 import config, { IConfig } from './config'
 
 export class ChainOps {
-    awsConfig: Config;
-    config: IConfig;
+    awsConfig: Config
+    config: IConfig
+    isLambdaExecution: boolean
 
     constructor (env: string | IConfig) {
       this.awsConfig = new Config()
-      this.awsConfig.credentials = new SharedIniFileCredentials()
+      this.isLambdaExecution = this.getIsLambdaExecution()
+
+      if (!this.isLambdaExecution) this.awsConfig.credentials = new SharedIniFileCredentials()
 
       if (typeof env === 'string') {
         console.log('Setting config from env:', env)
@@ -41,7 +44,7 @@ export class ChainOps {
       const url = new URL(this.config.SUBSCRIPTIONS_ENDPOINT + '/subscription')
 
       // @ts-ignore
-      await this.awsConfig.credentials.getPromise()
+      if (!this.isLambdaExecution) await this.awsConfig.credentials.getPromise()
       if (!this.awsConfig.credentials) throw new Error('AWS creds not set')
 
       const request = aws4.sign({
@@ -74,7 +77,7 @@ export class ChainOps {
       const url = new URL(this.config.SUBSCRIPTIONS_ENDPOINT + '/subscription/' + subscriptionId)
 
       // @ts-ignore
-      await this.awsConfig.credentials.getPromise()
+      if (!this.isLambdaExecution) await this.awsConfig.credentials.getPromise()
       if (!this.awsConfig.credentials) throw new Error('AWS creds not set')
 
       const request = aws4.sign({
@@ -99,5 +102,10 @@ export class ChainOps {
 
       const response = await axios.request(reqConfig)
       return response.data
+    }
+
+    getIsLambdaExecution () {
+      const env = process.env.AWS_LAMBDA_FUNCTION_NAME
+      return !!(env && env.length > 0)
     }
 }

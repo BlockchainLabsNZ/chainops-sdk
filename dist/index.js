@@ -19,7 +19,9 @@ const config_1 = __importDefault(require("./config"));
 class ChainOps {
     constructor(env) {
         this.awsConfig = new aws_sdk_1.Config();
-        this.awsConfig.credentials = new aws_sdk_1.SharedIniFileCredentials();
+        this.isLambdaExecution = this.getIsLambdaExecution();
+        if (!this.isLambdaExecution)
+            this.awsConfig.credentials = new aws_sdk_1.SharedIniFileCredentials();
         if (typeof env === 'string') {
             console.log('Setting config from env:', env);
             this.config = config_1.default[env];
@@ -47,8 +49,9 @@ class ChainOps {
     subscribe(subConfig) {
         return __awaiter(this, void 0, void 0, function* () {
             const url = new url_1.URL(this.config.SUBSCRIPTIONS_ENDPOINT + '/subscription');
-            //@ts-ignore
-            yield this.awsConfig.credentials.getPromise();
+            // @ts-ignore
+            if (!this.isLambdaExecution)
+                yield this.awsConfig.credentials.getPromise();
             if (!this.awsConfig.credentials)
                 throw new Error('AWS creds not set');
             const request = aws4_1.default.sign({
@@ -69,7 +72,7 @@ class ChainOps {
                 method: request.method,
                 url: request.url,
                 headers: request.headers,
-                data: JSON.stringify(subConfig),
+                data: JSON.stringify(subConfig)
             };
             const response = yield axios_1.default.request(reqConfig);
             return response.data;
@@ -78,8 +81,9 @@ class ChainOps {
     unsubscribe(subscriptionId) {
         return __awaiter(this, void 0, void 0, function* () {
             const url = new url_1.URL(this.config.SUBSCRIPTIONS_ENDPOINT + '/subscription/' + subscriptionId);
-            //@ts-ignore
-            yield this.awsConfig.credentials.getPromise();
+            // @ts-ignore
+            if (!this.isLambdaExecution)
+                yield this.awsConfig.credentials.getPromise();
             if (!this.awsConfig.credentials)
                 throw new Error('AWS creds not set');
             const request = aws4_1.default.sign({
@@ -103,6 +107,10 @@ class ChainOps {
             const response = yield axios_1.default.request(reqConfig);
             return response.data;
         });
+    }
+    getIsLambdaExecution() {
+        const env = process.env.AWS_LAMBDA_FUNCTION_NAME;
+        return !!(env && env.length > 0);
     }
 }
 exports.ChainOps = ChainOps;
