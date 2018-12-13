@@ -52,8 +52,6 @@ class ChainOps {
             // @ts-ignore
             if (!this.isLambdaExecution)
                 yield this.awsConfig.credentials.getPromise();
-            if (!this.awsConfig.credentials)
-                throw new Error('AWS creds not set');
             const request = aws4_1.default.sign({
                 host: url.host,
                 url: url.href,
@@ -63,11 +61,7 @@ class ChainOps {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(subConfig)
-            }, {
-                secretAccessKey: this.awsConfig.credentials.secretAccessKey,
-                accessKeyId: this.awsConfig.credentials.accessKeyId,
-                sessionToken: this.awsConfig.credentials.sessionToken
-            });
+            }, this.getCreds());
             const reqConfig = {
                 method: request.method,
                 url: request.url,
@@ -84,8 +78,6 @@ class ChainOps {
             // @ts-ignore
             if (!this.isLambdaExecution)
                 yield this.awsConfig.credentials.getPromise();
-            if (!this.awsConfig.credentials)
-                throw new Error('AWS creds not set');
             const request = aws4_1.default.sign({
                 host: url.host,
                 url: url.href,
@@ -94,11 +86,7 @@ class ChainOps {
                 headers: {
                     'Content-Type': 'application/json'
                 }
-            }, {
-                secretAccessKey: this.awsConfig.credentials.secretAccessKey,
-                accessKeyId: this.awsConfig.credentials.accessKeyId,
-                sessionToken: this.awsConfig.credentials.sessionToken
-            });
+            }, this.getCreds());
             const reqConfig = {
                 method: request.method,
                 url: request.url,
@@ -107,6 +95,18 @@ class ChainOps {
             const response = yield axios_1.default.request(reqConfig);
             return response.data;
         });
+    }
+    getCreds() {
+        if (!this.awsConfig.credentials)
+            throw new Error('AWS creds not set');
+        const creds = {
+            accessKeyId: this.awsConfig.credentials.accessKeyId,
+            sessionToken: this.awsConfig.credentials.sessionToken
+        };
+        if (!this.isLambdaExecution) {
+            creds.secretAccessKey = this.awsConfig.credentials.secretAccessKey;
+        }
+        return creds;
     }
     getIsLambdaExecution() {
         const env = process.env.AWS_LAMBDA_FUNCTION_NAME;

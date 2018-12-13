@@ -5,6 +5,12 @@ import { SharedIniFileCredentials, Config } from 'aws-sdk'
 
 import config, { IConfig } from './config'
 
+interface ICred {
+  secretAccessKey?: string
+  accessKeyId: string
+  sessionToken: string | undefined
+}
+
 export class ChainOps {
     awsConfig: Config
     config: IConfig
@@ -45,7 +51,6 @@ export class ChainOps {
 
       // @ts-ignore
       if (!this.isLambdaExecution) await this.awsConfig.credentials.getPromise()
-      if (!this.awsConfig.credentials) throw new Error('AWS creds not set')
 
       const request = aws4.sign({
         host: url.host,
@@ -56,11 +61,7 @@ export class ChainOps {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(subConfig)
-      }, {
-        secretAccessKey: this.awsConfig.credentials.secretAccessKey,
-        accessKeyId: this.awsConfig.credentials.accessKeyId,
-        sessionToken: this.awsConfig.credentials.sessionToken
-      })
+      }, this.getCreds())
 
       const reqConfig = {
         method: request.method,
@@ -78,7 +79,6 @@ export class ChainOps {
 
       // @ts-ignore
       if (!this.isLambdaExecution) await this.awsConfig.credentials.getPromise()
-      if (!this.awsConfig.credentials) throw new Error('AWS creds not set')
 
       const request = aws4.sign({
         host: url.host,
@@ -88,11 +88,7 @@ export class ChainOps {
         headers: {
           'Content-Type': 'application/json'
         }
-      }, {
-        secretAccessKey: this.awsConfig.credentials.secretAccessKey,
-        accessKeyId: this.awsConfig.credentials.accessKeyId,
-        sessionToken: this.awsConfig.credentials.sessionToken
-      })
+      }, this.getCreds())
 
       const reqConfig = {
         method: request.method,
@@ -102,6 +98,21 @@ export class ChainOps {
 
       const response = await axios.request(reqConfig)
       return response.data
+    }
+
+    getCreds () {
+      if (!this.awsConfig.credentials) throw new Error('AWS creds not set')
+
+      const creds: ICred = {
+        accessKeyId: this.awsConfig.credentials.accessKeyId,
+        sessionToken: this.awsConfig.credentials.sessionToken
+      }
+
+      if (!this.isLambdaExecution) {
+        creds.secretAccessKey = this.awsConfig.credentials.secretAccessKey
+      }
+
+      return creds
     }
 
     getIsLambdaExecution () {
