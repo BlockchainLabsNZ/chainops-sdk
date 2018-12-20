@@ -6,7 +6,7 @@ const { ChainOps } = require('../dist/index')
 
 describe('ChainOps Oracle API', () => {
   it('should retrieve the gas price for the latest block', async () => {
-    const chainOps = new ChainOps('sandbox_kovan')
+    const chainOps = new ChainOps('kovan')
     const result = await chainOps.getGasPrice()
 
     expect(result).toHaveProperty('blockNumber')
@@ -15,7 +15,7 @@ describe('ChainOps Oracle API', () => {
 
   it('should retrieve the gas price for a given block', async () => {
     const blockNumber = 6815686
-    const chainOps = new ChainOps('sandbox_kovan')
+    const chainOps = new ChainOps('kovan')
     const result = await chainOps.getGasPrice(blockNumber)
 
     expect(result).toHaveProperty('blockNumber')

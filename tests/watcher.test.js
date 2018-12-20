@@ -8,7 +8,7 @@ describe('ChainOps Watcher API', () => {
   let subscriptionId
 
   it('should make a subscription', async () => {
-    const chainOps = new ChainOps('sandbox_kovan')
+    const chainOps = new ChainOps('kovan')
 
     const subscription = await chainOps.subscribe({
       webhook: 'https://example.com',
@@ -26,7 +26,7 @@ describe('ChainOps Watcher API', () => {
   })
 
   it('should unsubscribe', async () => {
-    const chainOps = new ChainOps('sandbox_kovan')
+    const chainOps = new ChainOps('kovan')
     await chainOps.unsubscribe(subscriptionId)
   })
 })
