@@ -15,5 +15,6 @@ export declare class ChainOps {
     unsubscribe(subscriptionId: string): Promise<any>;
     getCreds(): ICred;
     getIsLambdaExecution(): boolean;
+    isDebugMode(): boolean | "" | undefined;
 }
 export {};

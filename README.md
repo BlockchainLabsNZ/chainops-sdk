@@ -12,3 +12,6 @@ Module to access the APIs exposed as ChainOps service:
 ```
 
 See tests for usage
+
+## Debug Mode
+set env var CHAINOPS_SDK_DEBUG=true

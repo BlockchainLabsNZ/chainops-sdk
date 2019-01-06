@@ -23,10 +23,12 @@ describe('ChainOps Watcher API', () => {
     expect(typeof subscription.subscription).toBe('string')
 
     subscriptionId = subscription.subscription
+    console.log('Successfully created sub', subscriptionId);
   })
 
   it('should unsubscribe', async () => {
     const chainOps = new ChainOps('kovan')
     await chainOps.unsubscribe(subscriptionId)
+    console.log('Successfully unsubscribed from sub', subscriptionId);
   })
 })

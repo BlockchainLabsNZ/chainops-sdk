@@ -34,10 +34,13 @@ class ChainOps {
     getGasPrice(blockNumber) {
         return __awaiter(this, void 0, void 0, function* () {
             const file = `${blockNumber || 'latest'}.json`;
-            const response = yield axios_1.default.request({
+            const config = {
                 baseURL: this.config.ORACLE_URL,
                 url: file
-            });
+            };
+            if (this.isDebugMode())
+                console.log(config);
+            const response = yield axios_1.default.request(config);
             try {
                 return response.data.analysis;
             }
@@ -68,6 +71,8 @@ class ChainOps {
                 headers: request.headers,
                 data: JSON.stringify(subConfig)
             };
+            if (this.isDebugMode())
+                console.log(reqConfig);
             const response = yield axios_1.default.request(reqConfig);
             return response.data;
         });
@@ -106,11 +111,17 @@ class ChainOps {
         if (!this.isLambdaExecution) {
             creds.secretAccessKey = this.awsConfig.credentials.secretAccessKey;
         }
+        if (this.isDebugMode())
+            console.log(creds);
         return creds;
     }
     getIsLambdaExecution() {
         const env = process.env.AWS_LAMBDA_FUNCTION_NAME;
         return !!(env && env.length > 0);
+    }
+    isDebugMode() {
+        const DEBUG_ENV_VAR = 'CHAINOPS_SDK_DEBUG';
+        return process.env[DEBUG_ENV_VAR] && process.env[DEBUG_ENV_VAR] === 'true';
     }
 }
 exports.ChainOps = ChainOps;

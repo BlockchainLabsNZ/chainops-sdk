@@ -33,11 +33,14 @@ export class ChainOps {
 
     async getGasPrice (blockNumber?: number) {
       const file = `${blockNumber || 'latest'}.json`
-
-      const response = await axios.request({
+      const config = {
         baseURL: this.config.ORACLE_URL,
         url: file
-      })
+      }
+
+      if (this.isDebugMode()) console.log(config)
+
+      const response = await axios.request(config)
 
       try {
         return response.data.analysis
@@ -69,6 +72,8 @@ export class ChainOps {
         headers: request.headers,
         data: JSON.stringify(subConfig)
       }
+
+      if (this.isDebugMode()) console.log(reqConfig)
 
       const response = await axios.request(reqConfig)
       return response.data
@@ -112,11 +117,19 @@ export class ChainOps {
         creds.secretAccessKey = this.awsConfig.credentials.secretAccessKey
       }
 
+      if (this.isDebugMode()) console.log(creds)
+
       return creds
     }
 
     getIsLambdaExecution () {
       const env = process.env.AWS_LAMBDA_FUNCTION_NAME
       return !!(env && env.length > 0)
+    }
+
+
+    isDebugMode () {
+      const DEBUG_ENV_VAR = 'CHAINOPS_SDK_DEBUG'
+      return process.env[DEBUG_ENV_VAR] && process.env[DEBUG_ENV_VAR] === 'true'
     }
 }
