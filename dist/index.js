@@ -108,11 +108,12 @@ class ChainOps {
             throw new Error('AWS creds not set');
         const creds = {
             accessKeyId: this.awsConfig.credentials.accessKeyId,
-            sessionToken: this.awsConfig.credentials.sessionToken
+            sessionToken: this.awsConfig.credentials.sessionToken,
+            secretAccessKey: this.awsConfig.credentials.secretAccessKey
         };
-        if (!this.isLambdaExecution) {
-            creds.secretAccessKey = this.awsConfig.credentials.secretAccessKey;
-        }
+        // if (!this.isLambdaExecution) {
+        //   creds.secretAccessKey = this.awsConfig.credentials.secretAccessKey
+        // }
         if (this.isDebugMode())
             console.log(creds);
         return creds;
