@@ -55,6 +55,8 @@ class ChainOps {
             // @ts-ignore
             if (!this.isLambdaExecution)
                 yield this.awsConfig.credentials.getPromise();
+            if (this.isDebugMode())
+                console.log('AWS Creds', this.awsConfig.credentials);
             const request = aws4_1.default.sign({
                 host: url.host,
                 url: url.href,
