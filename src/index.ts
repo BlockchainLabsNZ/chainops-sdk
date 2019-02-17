@@ -107,6 +107,41 @@ export class ChainOps {
       return response.data
     }
 
+    async getBlockNumberFromTimestamp (ts: number) {
+      const url = new URL(`${this.config.TS_TO_BLOCKNUMBER}/${ts}`)
+
+      // @ts-ignore
+      if (!this.isLambdaExecution) await this.awsConfig.credentials.getPromise()
+
+      if (this.isDebugMode()) console.log('AWS Creds', this.awsConfig.credentials)
+
+      const request = aws4.sign({
+        host: url.host,
+        url: url.href,
+        method: 'GET',
+        path: `${url.pathname}${url.search}`,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      }, this.getCreds())
+
+      const reqConfig = {
+        method: request.method,
+        url: request.url,
+        headers: request.headers,
+      }
+
+      if (this.isDebugMode()) console.log(reqConfig)
+
+      try {
+        const response = await axios.request(reqConfig)
+        return response.data
+      }catch(err) {
+        console.error(err);
+        throw err;
+      }
+    }
+
     getCreds () {
       if (!this.awsConfig.credentials) throw new Error('AWS creds not set')
 
@@ -129,7 +164,6 @@ export class ChainOps {
       const env = process.env.AWS_LAMBDA_FUNCTION_NAME
       return !!(env && env.length > 0)
     }
-
 
     isDebugMode () {
       const DEBUG_ENV_VAR = 'CHAINOPS_SDK_DEBUG'

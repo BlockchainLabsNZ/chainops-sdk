@@ -103,6 +103,40 @@ class ChainOps {
             return response.data;
         });
     }
+    getBlockNumberFromTimestamp(ts) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const url = new url_1.URL(`${this.config.TS_TO_BLOCKNUMBER}/${ts}`);
+            // @ts-ignore
+            if (!this.isLambdaExecution)
+                yield this.awsConfig.credentials.getPromise();
+            if (this.isDebugMode())
+                console.log('AWS Creds', this.awsConfig.credentials);
+            const request = aws4_1.default.sign({
+                host: url.host,
+                url: url.href,
+                method: 'GET',
+                path: `${url.pathname}${url.search}`,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            }, this.getCreds());
+            const reqConfig = {
+                method: request.method,
+                url: request.url,
+                headers: request.headers,
+            };
+            if (this.isDebugMode())
+                console.log(reqConfig);
+            try {
+                const response = yield axios_1.default.request(reqConfig);
+                return response.data;
+            }
+            catch (err) {
+                console.error(err);
+                throw err;
+            }
+        });
+    }
     getCreds() {
         if (!this.awsConfig.credentials)
             throw new Error('AWS creds not set');
