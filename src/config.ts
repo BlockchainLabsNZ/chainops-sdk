@@ -13,9 +13,9 @@ const config:IEnvConfig = {
 }
 
 export interface IConfig {
-    ORACLE_URL: string
-    SUBSCRIPTIONS_ENDPOINT: string
-    TS_TO_BLOCKNUMBER: string
+  ORACLE_URL?: string
+  SUBSCRIPTIONS_ENDPOINT?: string
+  TS_TO_BLOCKNUMBER?: string
 }
 
 interface IEnvConfig {

@@ -33,6 +33,9 @@ class ChainOps {
     }
     getGasPrice(blockNumber) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (!this.config.ORACLE_URL || this.config.ORACLE_URL.length === 0) {
+                throw new Error('Oracle endpoint not defined');
+            }
             const file = `${blockNumber || 'latest'}.json`;
             const config = {
                 baseURL: this.config.ORACLE_URL,
@@ -51,6 +54,9 @@ class ChainOps {
     }
     subscribe(subConfig) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (!this.config.SUBSCRIPTIONS_ENDPOINT || this.config.SUBSCRIPTIONS_ENDPOINT.length === 0) {
+                throw new Error('Subscriptions endpoint not defined');
+            }
             const url = new url_1.URL(this.config.SUBSCRIPTIONS_ENDPOINT + '/subscription');
             // @ts-ignore
             if (!this.isLambdaExecution)
@@ -75,12 +81,21 @@ class ChainOps {
             };
             if (this.isDebugMode())
                 console.log(reqConfig);
-            const response = yield axios_1.default.request(reqConfig);
-            return response.data;
+            try {
+                const response = yield axios_1.default.request(reqConfig);
+                return response.data;
+            }
+            catch (err) {
+                console.error('Erorr subscribing', err);
+                throw err;
+            }
         });
     }
     unsubscribe(subscriptionId) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (!this.config.SUBSCRIPTIONS_ENDPOINT || this.config.SUBSCRIPTIONS_ENDPOINT.length === 0) {
+                throw new Error('Subscriptions endpoint not defined');
+            }
             const url = new url_1.URL(this.config.SUBSCRIPTIONS_ENDPOINT + '/subscription/' + subscriptionId);
             // @ts-ignore
             if (!this.isLambdaExecution)
@@ -99,12 +114,21 @@ class ChainOps {
                 url: request.url,
                 headers: request.headers
             };
-            const response = yield axios_1.default.request(reqConfig);
-            return response.data;
+            try {
+                const response = yield axios_1.default.request(reqConfig);
+                return response.data;
+            }
+            catch (err) {
+                console.error('Error unsubscribing', err);
+                throw err;
+            }
         });
     }
     getBlockNumberFromTimestamp(ts) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (!this.config.TS_TO_BLOCKNUMBER || this.config.TS_TO_BLOCKNUMBER.length === 0) {
+                throw new Error('Timestamp to blocknumber endpoint not defined');
+            }
             const url = new url_1.URL(`${this.config.TS_TO_BLOCKNUMBER}/${ts}`);
             // @ts-ignore
             if (!this.isLambdaExecution)
@@ -132,7 +156,7 @@ class ChainOps {
                 return response.data;
             }
             catch (err) {
-                console.error(err);
+                console.error('Error getting blocknumber from timestamp', err);
                 throw err;
             }
         });

@@ -32,6 +32,10 @@ export class ChainOps {
     }
 
     async getGasPrice (blockNumber?: number) {
+      if (!this.config.ORACLE_URL || this.config.ORACLE_URL.length === 0) {
+        throw new Error('Oracle endpoint not defined')
+      }
+
       const file = `${blockNumber || 'latest'}.json`
       const config = {
         baseURL: this.config.ORACLE_URL,
@@ -50,6 +54,10 @@ export class ChainOps {
     }
 
     async subscribe (subConfig: any) {
+      if (!this.config.SUBSCRIPTIONS_ENDPOINT || this.config.SUBSCRIPTIONS_ENDPOINT.length === 0) {
+        throw new Error('Subscriptions endpoint not defined')
+      }
+
       const url = new URL(this.config.SUBSCRIPTIONS_ENDPOINT + '/subscription')
 
       // @ts-ignore
@@ -87,6 +95,10 @@ export class ChainOps {
     }
 
     async unsubscribe (subscriptionId: string) {
+      if (!this.config.SUBSCRIPTIONS_ENDPOINT || this.config.SUBSCRIPTIONS_ENDPOINT.length === 0) {
+        throw new Error('Subscriptions endpoint not defined')
+      }
+
       const url = new URL(this.config.SUBSCRIPTIONS_ENDPOINT + '/subscription/' + subscriptionId)
 
       // @ts-ignore
@@ -118,6 +130,10 @@ export class ChainOps {
     }
 
     async getBlockNumberFromTimestamp (ts: number) {
+      if (!this.config.TS_TO_BLOCKNUMBER || this.config.TS_TO_BLOCKNUMBER.length === 0) {
+        throw new Error('Timestamp to blocknumber endpoint not defined')
+      }
+
       const url = new URL(`${this.config.TS_TO_BLOCKNUMBER}/${ts}`)
 
       // @ts-ignore
