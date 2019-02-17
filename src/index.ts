@@ -77,8 +77,13 @@ export class ChainOps {
 
       if (this.isDebugMode()) console.log(reqConfig)
 
-      const response = await axios.request(reqConfig)
-      return response.data
+      try {
+        const response = await axios.request(reqConfig)
+        return response.data
+      }catch(err) {
+        console.error('Erorr subscribing', err)
+        throw err
+      }
     }
 
     async unsubscribe (subscriptionId: string) {
@@ -103,8 +108,13 @@ export class ChainOps {
         headers: request.headers
       }
 
-      const response = await axios.request(reqConfig)
-      return response.data
+      try {
+        const response = await axios.request(reqConfig)
+        return response.data
+      }catch(err) {
+        console.error('Error unsubscribing', err)
+        throw err
+      }
     }
 
     async getBlockNumberFromTimestamp (ts: number) {
@@ -137,8 +147,8 @@ export class ChainOps {
         const response = await axios.request(reqConfig)
         return response.data
       }catch(err) {
-        console.error(err);
-        throw err;
+        console.error('Error getting blocknumber from timestamp', err);
+        throw err
       }
     }
 
