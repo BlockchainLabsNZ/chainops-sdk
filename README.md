@@ -25,7 +25,7 @@ Method 2: Use own Chainops endpoints, e.g. custom deployment
 ```
 
 Config endpoints can be missing, however at runtime they will throw an error for that particular functionality
-e.g. TS_TO_BLOCKNUMBER can be '' or undefined, calling getBlockNumberFromTimestamp will thorw error
+e.g. TS_TO_BLOCKNUMBER can be '' or undefined, calling getBlockNumberFromTimestamp will throw error
 
 ## Chainops class methods
 ```typescript
