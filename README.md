@@ -4,6 +4,26 @@ Module to access the APIs exposed as ChainOps service:
 - Chainops-Watcher
 - Chainops-Oracle
 
+## Config
+
+Method 1: Use the out-of-the-box endpoints
+
+```js
+    const chainOps = new ChainOps('kovan')
+    //or
+    const chainOps = new ChainOps('mainnet')
+```
+
+Method 2: Use own Chainops endpoints, e.g. custom deployment
+
+```js
+    const chainOps = new ChainOps({
+        ORACLE_URL: string,
+        SUBSCRIPTIONS_ENDPOINT: string,
+        TS_TO_BLOCKNUMBER: string
+    })
+```
+
 ## Chainops class methods
 ```typescript
     getGasPrice(blockNumber?: number): Promise<any>;
