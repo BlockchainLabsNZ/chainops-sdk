@@ -9,6 +9,11 @@ Module to access the APIs exposed as ChainOps service:
     getGasPrice(blockNumber?: number): Promise<any>;
     subscribe(subConfig: any): Promise<any>;
     unsubscribe(subscriptionId: string): Promise<any>;
+
+    getBlockNumberFromTimestamp(ts: number): Promise<{
+        timestamp: number, 
+        blockNumber: number 
+    }>;
 ```
 
 See tests for usage
