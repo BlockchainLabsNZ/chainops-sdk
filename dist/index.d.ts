@@ -13,6 +13,7 @@ export declare class ChainOps {
     getGasPrice(blockNumber?: number): Promise<any>;
     subscribe(subConfig: any): Promise<any>;
     unsubscribe(subscriptionId: string): Promise<any>;
+    getBlockNumberFromTimestamp(ts: number): Promise<any>;
     getCreds(): ICred;
     getIsLambdaExecution(): boolean;
     isDebugMode(): boolean | "" | undefined;

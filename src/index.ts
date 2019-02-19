@@ -32,6 +32,10 @@ export class ChainOps {
     }
 
     async getGasPrice (blockNumber?: number) {
+      if (!this.config.ORACLE_URL || this.config.ORACLE_URL.length === 0) {
+        throw new Error('Oracle endpoint not defined')
+      }
+
       const file = `${blockNumber || 'latest'}.json`
       const config = {
         baseURL: this.config.ORACLE_URL,
@@ -50,6 +54,10 @@ export class ChainOps {
     }
 
     async subscribe (subConfig: any) {
+      if (!this.config.SUBSCRIPTIONS_ENDPOINT || this.config.SUBSCRIPTIONS_ENDPOINT.length === 0) {
+        throw new Error('Subscriptions endpoint not defined')
+      }
+
       const url = new URL(this.config.SUBSCRIPTIONS_ENDPOINT + '/subscription')
 
       // @ts-ignore
@@ -77,11 +85,20 @@ export class ChainOps {
 
       if (this.isDebugMode()) console.log(reqConfig)
 
-      const response = await axios.request(reqConfig)
-      return response.data
+      try {
+        const response = await axios.request(reqConfig)
+        return response.data
+      }catch(err) {
+        console.error('Erorr subscribing', err)
+        throw err
+      }
     }
 
     async unsubscribe (subscriptionId: string) {
+      if (!this.config.SUBSCRIPTIONS_ENDPOINT || this.config.SUBSCRIPTIONS_ENDPOINT.length === 0) {
+        throw new Error('Subscriptions endpoint not defined')
+      }
+
       const url = new URL(this.config.SUBSCRIPTIONS_ENDPOINT + '/subscription/' + subscriptionId)
 
       // @ts-ignore
@@ -103,8 +120,52 @@ export class ChainOps {
         headers: request.headers
       }
 
-      const response = await axios.request(reqConfig)
-      return response.data
+      try {
+        const response = await axios.request(reqConfig)
+        return response.data
+      }catch(err) {
+        console.error('Error unsubscribing', err)
+        throw err
+      }
+    }
+
+    async getBlockNumberFromTimestamp (ts: number) {
+      if (!this.config.TS_TO_BLOCKNUMBER || this.config.TS_TO_BLOCKNUMBER.length === 0) {
+        throw new Error('Timestamp to blocknumber endpoint not defined')
+      }
+
+      const url = new URL(`${this.config.TS_TO_BLOCKNUMBER}/${ts}`)
+
+      // @ts-ignore
+      if (!this.isLambdaExecution) await this.awsConfig.credentials.getPromise()
+
+      if (this.isDebugMode()) console.log('AWS Creds', this.awsConfig.credentials)
+
+      const request = aws4.sign({
+        host: url.host,
+        url: url.href,
+        method: 'GET',
+        path: `${url.pathname}${url.search}`,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      }, this.getCreds())
+
+      const reqConfig = {
+        method: request.method,
+        url: request.url,
+        headers: request.headers,
+      }
+
+      if (this.isDebugMode()) console.log(reqConfig)
+
+      try {
+        const response = await axios.request(reqConfig)
+        return response.data
+      }catch(err) {
+        console.error('Error getting blocknumber from timestamp', err);
+        throw err
+      }
     }
 
     getCreds () {
@@ -129,7 +190,6 @@ export class ChainOps {
       const env = process.env.AWS_LAMBDA_FUNCTION_NAME
       return !!(env && env.length > 0)
     }
-
 
     isDebugMode () {
       const DEBUG_ENV_VAR = 'CHAINOPS_SDK_DEBUG'

@@ -4,11 +4,39 @@ Module to access the APIs exposed as ChainOps service:
 - Chainops-Watcher
 - Chainops-Oracle
 
+## Config
+
+Method 1: Use the out-of-the-box endpoints
+
+```js
+    const chainOps = new ChainOps('kovan')
+    //or
+    const chainOps = new ChainOps('mainnet')
+```
+
+Method 2: Use own Chainops endpoints, e.g. custom deployment
+
+```js
+    const chainOps = new ChainOps({
+        ORACLE_URL: string,
+        SUBSCRIPTIONS_ENDPOINT: string,
+        TS_TO_BLOCKNUMBER: string
+    })
+```
+
+Config endpoints can be missing, however at runtime they will throw an error for that particular functionality
+e.g. TS_TO_BLOCKNUMBER can be '' or undefined, calling getBlockNumberFromTimestamp will throw error
+
 ## Chainops class methods
 ```typescript
     getGasPrice(blockNumber?: number): Promise<any>;
     subscribe(subConfig: any): Promise<any>;
     unsubscribe(subscriptionId: string): Promise<any>;
+
+    getBlockNumberFromTimestamp(ts: number): Promise<{
+        timestamp: number, 
+        blockNumber: number 
+    }>;
 ```
 
 See tests for usage
