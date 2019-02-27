@@ -3,6 +3,8 @@ import axios from 'axios'
 import { URL } from 'url'
 import { SharedIniFileCredentials, Config } from 'aws-sdk'
 
+import { getTimestampsToCache } from './precacheTsToBlocknumber'
+
 import config, { IConfig } from './config'
 
 interface ICred {
@@ -12,60 +14,67 @@ interface ICred {
 }
 
 export class ChainOps {
-    awsConfig: Config
-    config: IConfig
-    isLambdaExecution: boolean
+  awsConfig: Config
+  config: IConfig
+  isLambdaExecution: boolean
 
-    constructor (env: string | IConfig) {
-      this.awsConfig = new Config()
-      this.isLambdaExecution = this.getIsLambdaExecution()
+  constructor(env: string | IConfig) {
+    this.awsConfig = new Config()
+    this.isLambdaExecution = this.getIsLambdaExecution()
 
-      if (!this.isLambdaExecution) this.awsConfig.credentials = new SharedIniFileCredentials()
+    if (!this.isLambdaExecution)
+      this.awsConfig.credentials = new SharedIniFileCredentials()
 
-      if (typeof env === 'string') {
-        console.log('Setting config from env:', env)
-        this.config = config[env]
-      } else {
-        console.log('Setting config from object:', env)
-        this.config = env
-      }
+    if (typeof env === 'string') {
+      console.log('Setting config from env:', env)
+      this.config = config[env]
+    } else {
+      console.log('Setting config from object:', env)
+      this.config = env
+    }
+  }
+
+  async getGasPrice(blockNumber?: number) {
+    if (!this.config.ORACLE_URL || this.config.ORACLE_URL.length === 0) {
+      throw new Error('Oracle endpoint not defined')
     }
 
-    async getGasPrice (blockNumber?: number) {
-      if (!this.config.ORACLE_URL || this.config.ORACLE_URL.length === 0) {
-        throw new Error('Oracle endpoint not defined')
-      }
-
-      const file = `${blockNumber || 'latest'}.json`
-      const config = {
-        baseURL: this.config.ORACLE_URL,
-        url: file
-      }
-
-      if (this.isDebugMode()) console.log(config)
-
-      const response = await axios.request(config)
-
-      try {
-        return response.data.analysis
-      } catch (err) {
-        throw new Error(`Could not retrieve gas prices for block: ${blockNumber || 'latest'}`)
-      }
+    const file = `${blockNumber || 'latest'}.json`
+    const config = {
+      baseURL: this.config.ORACLE_URL,
+      url: file
     }
 
-    async subscribe (subConfig: any) {
-      if (!this.config.SUBSCRIPTIONS_ENDPOINT || this.config.SUBSCRIPTIONS_ENDPOINT.length === 0) {
-        throw new Error('Subscriptions endpoint not defined')
-      }
+    if (this.isDebugMode()) console.log(config)
 
-      const url = new URL(this.config.SUBSCRIPTIONS_ENDPOINT + '/subscription')
+    const response = await axios.request(config)
 
-      // @ts-ignore
-      if (!this.isLambdaExecution) await this.awsConfig.credentials.getPromise()
+    try {
+      return response.data.analysis
+    } catch (err) {
+      throw new Error(
+        `Could not retrieve gas prices for block: ${blockNumber || 'latest'}`
+      )
+    }
+  }
 
-      if (this.isDebugMode()) console.log('AWS Creds', this.awsConfig.credentials)
+  async subscribe(subConfig: any) {
+    if (
+      !this.config.SUBSCRIPTIONS_ENDPOINT ||
+      this.config.SUBSCRIPTIONS_ENDPOINT.length === 0
+    ) {
+      throw new Error('Subscriptions endpoint not defined')
+    }
 
-      const request = aws4.sign({
+    const url = new URL(this.config.SUBSCRIPTIONS_ENDPOINT + '/subscription')
+
+    // @ts-ignore
+    if (!this.isLambdaExecution) await this.awsConfig.credentials.getPromise()
+
+    if (this.isDebugMode()) console.log('AWS Creds', this.awsConfig.credentials)
+
+    const request = aws4.sign(
+      {
         host: url.host,
         url: url.href,
         method: 'PUT',
@@ -74,37 +83,45 @@ export class ChainOps {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(subConfig)
-      }, this.getCreds())
+      },
+      this.getCreds()
+    )
 
-      const reqConfig = {
-        method: request.method,
-        url: request.url,
-        headers: request.headers,
-        data: JSON.stringify(subConfig)
-      }
-
-      if (this.isDebugMode()) console.log(reqConfig)
-
-      try {
-        const response = await axios.request(reqConfig)
-        return response.data
-      }catch(err) {
-        console.error('Erorr subscribing', err)
-        throw err
-      }
+    const reqConfig = {
+      method: request.method,
+      url: request.url,
+      headers: request.headers,
+      data: JSON.stringify(subConfig)
     }
 
-    async unsubscribe (subscriptionId: string) {
-      if (!this.config.SUBSCRIPTIONS_ENDPOINT || this.config.SUBSCRIPTIONS_ENDPOINT.length === 0) {
-        throw new Error('Subscriptions endpoint not defined')
-      }
+    if (this.isDebugMode()) console.log(reqConfig)
 
-      const url = new URL(this.config.SUBSCRIPTIONS_ENDPOINT + '/subscription/' + subscriptionId)
+    try {
+      const response = await axios.request(reqConfig)
+      return response.data
+    } catch (err) {
+      console.error('Error subscribing', err)
+      throw err
+    }
+  }
 
-      // @ts-ignore
-      if (!this.isLambdaExecution) await this.awsConfig.credentials.getPromise()
+  async unsubscribe(subscriptionId: string) {
+    if (
+      !this.config.SUBSCRIPTIONS_ENDPOINT ||
+      this.config.SUBSCRIPTIONS_ENDPOINT.length === 0
+    ) {
+      throw new Error('Subscriptions endpoint not defined')
+    }
 
-      const request = aws4.sign({
+    const url = new URL(
+      this.config.SUBSCRIPTIONS_ENDPOINT + '/subscription/' + subscriptionId
+    )
+
+    // @ts-ignore
+    if (!this.isLambdaExecution) await this.awsConfig.credentials.getPromise()
+
+    const request = aws4.sign(
+      {
         host: url.host,
         url: url.href,
         method: 'DELETE',
@@ -112,87 +129,127 @@ export class ChainOps {
         headers: {
           'Content-Type': 'application/json'
         }
-      }, this.getCreds())
+      },
+      this.getCreds()
+    )
 
-      const reqConfig = {
-        method: request.method,
-        url: request.url,
-        headers: request.headers
-      }
-
-      try {
-        const response = await axios.request(reqConfig)
-        return response.data
-      }catch(err) {
-        console.error('Error unsubscribing', err)
-        throw err
-      }
+    const reqConfig = {
+      method: request.method,
+      url: request.url,
+      headers: request.headers
     }
 
-    async getBlockNumberFromTimestamp (ts: number) {
-      if (!this.config.TS_TO_BLOCKNUMBER || this.config.TS_TO_BLOCKNUMBER.length === 0) {
-        throw new Error('Timestamp to blocknumber endpoint not defined')
-      }
+    try {
+      const response = await axios.request(reqConfig)
+      return response.data
+    } catch (err) {
+      console.error('Error unsubscribing', err)
+      throw err
+    }
+  }
 
-      const url = new URL(`${this.config.TS_TO_BLOCKNUMBER}/${ts}`)
+  async getBlockNumberFromTimestamp(ts: number) {
+    if (
+      !this.config.TS_TO_BLOCKNUMBER ||
+      this.config.TS_TO_BLOCKNUMBER.length === 0
+    ) {
+      throw new Error('Timestamp to blocknumber endpoint not defined')
+    }
 
-      // @ts-ignore
-      if (!this.isLambdaExecution) await this.awsConfig.credentials.getPromise()
+    const url = new URL(`${this.config.TS_TO_BLOCKNUMBER}/${ts}`)
+    return this.callBlockNumberFromTimestamp(url)
+  }
 
-      if (this.isDebugMode()) console.log('AWS Creds', this.awsConfig.credentials)
+  async getBlockNumberFromIso(isoString: string) {
+    if (
+      !this.config.TS_TO_BLOCKNUMBER ||
+      this.config.TS_TO_BLOCKNUMBER.length === 0
+    ) {
+      throw new Error('Timestamp to blocknumber endpoint not defined')
+    }
 
-      const request = aws4.sign({
+    const url = new URL(
+      `${this.config.TS_TO_BLOCKNUMBER}/iso/${encodeURIComponent(isoString)}`
+    )
+    return this.callBlockNumberFromTimestamp(url)
+  }
+
+  async callBlockNumberFromTimestamp(url: URL) {
+    // @ts-ignore
+    if (!this.isLambdaExecution) await this.awsConfig.credentials.getPromise()
+
+    if (this.isDebugMode()) console.log('AWS Creds', this.awsConfig.credentials)
+
+    const request = aws4.sign(
+      {
         host: url.host,
         url: url.href,
         method: 'GET',
         path: `${url.pathname}${url.search}`,
         headers: {
           'Content-Type': 'application/json'
-        },
-      }, this.getCreds())
+        }
+      },
+      this.getCreds()
+    )
 
-      const reqConfig = {
-        method: request.method,
-        url: request.url,
-        headers: request.headers,
-      }
-
-      if (this.isDebugMode()) console.log(reqConfig)
-
-      try {
-        const response = await axios.request(reqConfig)
-        return response.data
-      }catch(err) {
-        console.error('Error getting blocknumber from timestamp', err);
-        throw err
-      }
+    const reqConfig = {
+      method: request.method,
+      url: request.url,
+      headers: request.headers
     }
 
-    getCreds () {
-      if (!this.awsConfig.credentials) throw new Error('AWS creds not set')
+    if (this.isDebugMode()) console.log(reqConfig)
 
-      const creds: ICred = {
-        accessKeyId: this.awsConfig.credentials.accessKeyId,
-        sessionToken: this.awsConfig.credentials.sessionToken,
-        secretAccessKey: this.awsConfig.credentials.secretAccessKey
-      }
+    try {
+      const response = await axios.request(reqConfig)
+      return response.data
+    } catch (err) {
+      console.error('Error calling blocknumber from timestamp endpoint', err)
+      throw err
+    }
+  }
 
-      // if (!this.isLambdaExecution) {
-      //   creds.secretAccessKey = this.awsConfig.credentials.secretAccessKey
-      // }
+  //makes the calls to precache the last 24 months
+  async warmBlockNumberFromTimestampCache(timezone: string) {
+    const timestamps = getTimestampsToCache(timezone)
 
-      if (this.isDebugMode()) console.log(creds)
+    console.log('Warming', timestamps)
 
-      return creds
+    const actions = timestamps.map(ts => {
+      return this.getBlockNumberFromTimestamp(ts).catch(err => {
+        console.error('Failed to warm cache for timestamp', ts, err)
+      })
+    })
+
+    return Promise.all(actions)
+  }
+
+  getCreds() {
+    if (!this.awsConfig.credentials) throw new Error('AWS creds not set')
+
+    const creds: ICred = {
+      accessKeyId: this.awsConfig.credentials.accessKeyId,
+      sessionToken: this.awsConfig.credentials.sessionToken,
+      secretAccessKey: this.awsConfig.credentials.secretAccessKey
     }
 
-    getIsLambdaExecution () {
-      const env = process.env.AWS_LAMBDA_FUNCTION_NAME
-      return !!(env && env.length > 0)
-    }
+    // if (!this.isLambdaExecution) {
+    //   creds.secretAccessKey = this.awsConfig.credentials.secretAccessKey
+    // }
 
-    isDebugMode () {
-      const DEBUG_ENV_VAR = 'CHAINOPS_SDK_DEBUG'
-      return process.env[DEBUG_ENV_VAR] && process.env[DEBUG_ENV_VAR] === 'true'
-    }
+    if (this.isDebugMode()) console.log(creds)
+
+    return creds
+  }
+
+  getIsLambdaExecution() {
+    const env = process.env.AWS_LAMBDA_FUNCTION_NAME
+    return !!(env && env.length > 0)
+  }
+
+  isDebugMode() {
+    const DEBUG_ENV_VAR = 'CHAINOPS_SDK_DEBUG'
+    return process.env[DEBUG_ENV_VAR] && process.env[DEBUG_ENV_VAR] === 'true'
+  }
 }
