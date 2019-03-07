@@ -15,6 +15,7 @@ const aws4_1 = __importDefault(require("aws4"));
 const axios_1 = __importDefault(require("axios"));
 const url_1 = require("url");
 const aws_sdk_1 = require("aws-sdk");
+const precacheTsToBlocknumber_1 = require("./precacheTsToBlocknumber");
 const config_1 = __importDefault(require("./config"));
 class ChainOps {
     constructor(env) {
@@ -54,7 +55,8 @@ class ChainOps {
     }
     subscribe(subConfig) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.config.SUBSCRIPTIONS_ENDPOINT || this.config.SUBSCRIPTIONS_ENDPOINT.length === 0) {
+            if (!this.config.SUBSCRIPTIONS_ENDPOINT ||
+                this.config.SUBSCRIPTIONS_ENDPOINT.length === 0) {
                 throw new Error('Subscriptions endpoint not defined');
             }
             const url = new url_1.URL(this.config.SUBSCRIPTIONS_ENDPOINT + '/subscription');
@@ -86,14 +88,15 @@ class ChainOps {
                 return response.data;
             }
             catch (err) {
-                console.error('Erorr subscribing', err);
+                console.error('Error subscribing', err);
                 throw err;
             }
         });
     }
     unsubscribe(subscriptionId) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.config.SUBSCRIPTIONS_ENDPOINT || this.config.SUBSCRIPTIONS_ENDPOINT.length === 0) {
+            if (!this.config.SUBSCRIPTIONS_ENDPOINT ||
+                this.config.SUBSCRIPTIONS_ENDPOINT.length === 0) {
                 throw new Error('Subscriptions endpoint not defined');
             }
             const url = new url_1.URL(this.config.SUBSCRIPTIONS_ENDPOINT + '/subscription/' + subscriptionId);
@@ -126,10 +129,26 @@ class ChainOps {
     }
     getBlockNumberFromTimestamp(ts) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.config.TS_TO_BLOCKNUMBER || this.config.TS_TO_BLOCKNUMBER.length === 0) {
+            if (!this.config.TS_TO_BLOCKNUMBER ||
+                this.config.TS_TO_BLOCKNUMBER.length === 0) {
                 throw new Error('Timestamp to blocknumber endpoint not defined');
             }
             const url = new url_1.URL(`${this.config.TS_TO_BLOCKNUMBER}/${ts}`);
+            return this.callBlockNumberFromTimestamp(url);
+        });
+    }
+    getBlockNumberFromIso(isoString) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.config.TS_TO_BLOCKNUMBER ||
+                this.config.TS_TO_BLOCKNUMBER.length === 0) {
+                throw new Error('Timestamp to blocknumber endpoint not defined');
+            }
+            const url = new url_1.URL(`${this.config.TS_TO_BLOCKNUMBER}/iso/${encodeURIComponent(isoString)}`);
+            return this.callBlockNumberFromTimestamp(url);
+        });
+    }
+    callBlockNumberFromTimestamp(url) {
+        return __awaiter(this, void 0, void 0, function* () {
             // @ts-ignore
             if (!this.isLambdaExecution)
                 yield this.awsConfig.credentials.getPromise();
@@ -142,12 +161,12 @@ class ChainOps {
                 path: `${url.pathname}${url.search}`,
                 headers: {
                     'Content-Type': 'application/json'
-                },
+                }
             }, this.getCreds());
             const reqConfig = {
                 method: request.method,
                 url: request.url,
-                headers: request.headers,
+                headers: request.headers
             };
             if (this.isDebugMode())
                 console.log(reqConfig);
@@ -156,9 +175,22 @@ class ChainOps {
                 return response.data;
             }
             catch (err) {
-                console.error('Error getting blocknumber from timestamp', err);
+                console.error('Error calling blocknumber from timestamp endpoint', err);
                 throw err;
             }
+        });
+    }
+    //makes the calls to precache the last 24 months
+    warmBlockNumberFromTimestampCache(timezone) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const timestamps = precacheTsToBlocknumber_1.getTimestampsToCache(timezone);
+            console.log('Warming', timestamps);
+            const actions = timestamps.map(ts => {
+                return this.getBlockNumberFromTimestamp(ts).catch(err => {
+                    console.error('Failed to warm cache for timestamp', ts, err);
+                });
+            });
+            return Promise.all(actions);
         });
     }
     getCreds() {
