@@ -89,7 +89,7 @@ export class ChainOps {
   }
 
   //makes the calls to precache the last 24 months
-  async warmBlockNumberFromTimestampCache(timezone: string) {
+  async warmBlockNumberFromTimestampCache(timezone: string = 'Etc/UTC') {
     const creds = await this.getCreds()
 
     return tsToBlocknumber.warmBlockNumberFromTimestampCache(
