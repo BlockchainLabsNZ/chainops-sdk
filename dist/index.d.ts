@@ -1,6 +1,6 @@
 import { Config } from 'aws-sdk';
 import { IConfig } from './config';
-interface ICred {
+export interface ICred {
     secretAccessKey?: string;
     accessKeyId: string;
     sessionToken: string | undefined;
@@ -11,11 +11,12 @@ export declare class ChainOps {
     isLambdaExecution: boolean;
     constructor(env: string | IConfig);
     getGasPrice(blockNumber?: number): Promise<any>;
+    getEndpoint(endpointName: string): string;
     subscribe(subConfig: any): Promise<any>;
     unsubscribe(subscriptionId: string): Promise<any>;
     getBlockNumberFromTimestamp(ts: number): Promise<any>;
-    getCreds(): ICred;
+    getBlockNumberFromIso(isoString: string): Promise<any>;
+    warmBlockNumberFromTimestampCache(timezone: string): Promise<any[]>;
+    getCreds(): Promise<ICred>;
     getIsLambdaExecution(): boolean;
-    isDebugMode(): boolean | "" | undefined;
 }
-export {};

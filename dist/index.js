@@ -10,12 +10,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const aws4_1 = __importDefault(require("aws4"));
-const axios_1 = __importDefault(require("axios"));
-const url_1 = require("url");
 const aws_sdk_1 = require("aws-sdk");
 const config_1 = __importDefault(require("./config"));
+const utils_1 = require("./utils");
+const watcher = __importStar(require("./watcher"));
+const oracle = __importStar(require("./oracle"));
+const tsToBlocknumber = __importStar(require("./tsToBlocknumber"));
 class ChainOps {
     constructor(env) {
         this.awsConfig = new aws_sdk_1.Config();
@@ -33,156 +41,70 @@ class ChainOps {
     }
     getGasPrice(blockNumber) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.config.ORACLE_URL || this.config.ORACLE_URL.length === 0) {
-                throw new Error('Oracle endpoint not defined');
-            }
-            const file = `${blockNumber || 'latest'}.json`;
-            const config = {
-                baseURL: this.config.ORACLE_URL,
-                url: file
-            };
-            if (this.isDebugMode())
-                console.log(config);
-            const response = yield axios_1.default.request(config);
-            try {
-                return response.data.analysis;
-            }
-            catch (err) {
-                throw new Error(`Could not retrieve gas prices for block: ${blockNumber || 'latest'}`);
-            }
+            return oracle.getGasPrice(this.getEndpoint('ORACLE_URL'), blockNumber);
         });
+    }
+    getEndpoint(endpointName) {
+        //@ts-ignore
+        if (!this.config[endpointName] || this.config[endpointName].length === 0) {
+            throw new Error(endpointName + ' endpoint not defined');
+        }
+        //@ts-ignore
+        return this.config[endpointName];
     }
     subscribe(subConfig) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.config.SUBSCRIPTIONS_ENDPOINT || this.config.SUBSCRIPTIONS_ENDPOINT.length === 0) {
-                throw new Error('Subscriptions endpoint not defined');
-            }
-            const url = new url_1.URL(this.config.SUBSCRIPTIONS_ENDPOINT + '/subscription');
-            // @ts-ignore
-            if (!this.isLambdaExecution)
-                yield this.awsConfig.credentials.getPromise();
-            if (this.isDebugMode())
-                console.log('AWS Creds', this.awsConfig.credentials);
-            const request = aws4_1.default.sign({
-                host: url.host,
-                url: url.href,
-                method: 'PUT',
-                path: `${url.pathname}${url.search}`,
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(subConfig)
-            }, this.getCreds());
-            const reqConfig = {
-                method: request.method,
-                url: request.url,
-                headers: request.headers,
-                data: JSON.stringify(subConfig)
-            };
-            if (this.isDebugMode())
-                console.log(reqConfig);
-            try {
-                const response = yield axios_1.default.request(reqConfig);
-                return response.data;
-            }
-            catch (err) {
-                console.error('Erorr subscribing', err);
-                throw err;
-            }
+            const creds = yield this.getCreds();
+            return watcher.subscribe(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, subConfig);
         });
     }
     unsubscribe(subscriptionId) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.config.SUBSCRIPTIONS_ENDPOINT || this.config.SUBSCRIPTIONS_ENDPOINT.length === 0) {
-                throw new Error('Subscriptions endpoint not defined');
-            }
-            const url = new url_1.URL(this.config.SUBSCRIPTIONS_ENDPOINT + '/subscription/' + subscriptionId);
-            // @ts-ignore
-            if (!this.isLambdaExecution)
-                yield this.awsConfig.credentials.getPromise();
-            const request = aws4_1.default.sign({
-                host: url.host,
-                url: url.href,
-                method: 'DELETE',
-                path: `${url.pathname}${url.search}`,
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }, this.getCreds());
-            const reqConfig = {
-                method: request.method,
-                url: request.url,
-                headers: request.headers
-            };
-            try {
-                const response = yield axios_1.default.request(reqConfig);
-                return response.data;
-            }
-            catch (err) {
-                console.error('Error unsubscribing', err);
-                throw err;
-            }
+            const creds = yield this.getCreds();
+            return watcher.unsubscribe(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, subscriptionId);
         });
     }
     getBlockNumberFromTimestamp(ts) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.config.TS_TO_BLOCKNUMBER || this.config.TS_TO_BLOCKNUMBER.length === 0) {
-                throw new Error('Timestamp to blocknumber endpoint not defined');
-            }
-            const url = new url_1.URL(`${this.config.TS_TO_BLOCKNUMBER}/${ts}`);
-            // @ts-ignore
-            if (!this.isLambdaExecution)
-                yield this.awsConfig.credentials.getPromise();
-            if (this.isDebugMode())
-                console.log('AWS Creds', this.awsConfig.credentials);
-            const request = aws4_1.default.sign({
-                host: url.host,
-                url: url.href,
-                method: 'GET',
-                path: `${url.pathname}${url.search}`,
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            }, this.getCreds());
-            const reqConfig = {
-                method: request.method,
-                url: request.url,
-                headers: request.headers,
-            };
-            if (this.isDebugMode())
-                console.log(reqConfig);
-            try {
-                const response = yield axios_1.default.request(reqConfig);
-                return response.data;
-            }
-            catch (err) {
-                console.error('Error getting blocknumber from timestamp', err);
-                throw err;
-            }
+            const creds = yield this.getCreds();
+            return tsToBlocknumber.getBlockNumberFromTimestamp(this.getEndpoint('TS_TO_BLOCKNUMBER'), creds, ts);
+        });
+    }
+    getBlockNumberFromIso(isoString) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const creds = yield this.getCreds();
+            return tsToBlocknumber.getBlockNumberFromIso(this.getEndpoint('TS_TO_BLOCKNUMBER'), creds, isoString);
+        });
+    }
+    //makes the calls to precache the last 24 months
+    warmBlockNumberFromTimestampCache(timezone) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const creds = yield this.getCreds();
+            return tsToBlocknumber.warmBlockNumberFromTimestampCache(this.getEndpoint('TS_TO_BLOCKNUMBER'), creds, timezone);
         });
     }
     getCreds() {
-        if (!this.awsConfig.credentials)
-            throw new Error('AWS creds not set');
-        const creds = {
-            accessKeyId: this.awsConfig.credentials.accessKeyId,
-            sessionToken: this.awsConfig.credentials.sessionToken,
-            secretAccessKey: this.awsConfig.credentials.secretAccessKey
-        };
-        // if (!this.isLambdaExecution) {
-        //   creds.secretAccessKey = this.awsConfig.credentials.secretAccessKey
-        // }
-        if (this.isDebugMode())
-            console.log(creds);
-        return creds;
+        return __awaiter(this, void 0, void 0, function* () {
+            if (utils_1.isDebugMode())
+                console.log('AWS Creds', this.awsConfig.credentials);
+            if (!this.awsConfig.credentials)
+                throw new Error('AWS creds not set');
+            // @ts-ignore
+            if (!this.isLambdaExecution)
+                yield this.awsConfig.credentials.getPromise();
+            const creds = {
+                accessKeyId: this.awsConfig.credentials.accessKeyId,
+                sessionToken: this.awsConfig.credentials.sessionToken,
+                secretAccessKey: this.awsConfig.credentials.secretAccessKey
+            };
+            if (utils_1.isDebugMode())
+                console.log(creds);
+            return creds;
+        });
     }
     getIsLambdaExecution() {
         const env = process.env.AWS_LAMBDA_FUNCTION_NAME;
         return !!(env && env.length > 0);
-    }
-    isDebugMode() {
-        const DEBUG_ENV_VAR = 'CHAINOPS_SDK_DEBUG';
-        return process.env[DEBUG_ENV_VAR] && process.env[DEBUG_ENV_VAR] === 'true';
     }
 }
 exports.ChainOps = ChainOps;
