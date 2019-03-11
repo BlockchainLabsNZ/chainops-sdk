@@ -68,6 +68,16 @@ export class ChainOps {
     )
   }
 
+  async listSubs(filter: watcher.IListFilter) {
+    const creds = await this.getCreds()
+
+    return watcher.listSubs(
+      this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'),
+      creds,
+      filter
+    )
+  }
+
   async getBlockNumberFromTimestamp(ts: number) {
     const creds = await this.getCreds()
 
