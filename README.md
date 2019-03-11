@@ -37,6 +37,19 @@ e.g. TS_TO_BLOCKNUMBER can be '' or undefined, calling getBlockNumberFromTimesta
     subscribe(subConfig: any): Promise<any>
     unsubscribe(subscriptionId: string): Promise<any>
 
+    listSubs(filter?): Promise<ISubscription[]>
+    Filter {
+        webhookContains?: string
+        webhookEquals?: string
+        nameContains?: string
+        nameEquals?: string
+        filterContains?: string
+        filterFromContains?: string
+        filterToContains?: string
+        filterLogAddressContains?: string
+        filterTopicContains?: string
+    }
+
     getBlockNumberFromTimestamp(ts: number): Promise<{
         timestamp: number,
         blockNumber: number
