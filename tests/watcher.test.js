@@ -26,6 +26,15 @@ describe('ChainOps Watcher API', () => {
     console.log('Successfully created sub', subscriptionId)
   })
 
+  it('should list subscriptions', async () => {
+    const chainOps = new ChainOps('kovan')
+
+    const subscriptions = await chainOps.listSubs()
+    expect(subscriptions.length).toBeGreaterThan(0)
+
+    console.log('Successfully listed subs', subscriptions)
+  })
+
   it('should unsubscribe', async () => {
     const chainOps = new ChainOps('kovan')
     await chainOps.unsubscribe(subscriptionId)

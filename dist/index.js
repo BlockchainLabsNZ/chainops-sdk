@@ -64,6 +64,12 @@ class ChainOps {
             return watcher.unsubscribe(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, subscriptionId);
         });
     }
+    listSubs(filter) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const creds = yield this.getCreds();
+            return watcher.listSubs(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, filter);
+        });
+    }
     getBlockNumberFromTimestamp(ts) {
         return __awaiter(this, void 0, void 0, function* () {
             const creds = yield this.getCreds();
@@ -77,7 +83,7 @@ class ChainOps {
         });
     }
     //makes the calls to precache the last 24 months
-    warmBlockNumberFromTimestampCache(timezone) {
+    warmBlockNumberFromTimestampCache(timezone = 'Etc/UTC') {
         return __awaiter(this, void 0, void 0, function* () {
             const creds = yield this.getCreds();
             return tsToBlocknumber.warmBlockNumberFromTimestampCache(this.getEndpoint('TS_TO_BLOCKNUMBER'), creds, timezone);

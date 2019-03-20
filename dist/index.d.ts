@@ -1,5 +1,6 @@
 import { Config } from 'aws-sdk';
 import { IConfig } from './config';
+import * as watcher from './watcher';
 export interface ICred {
     secretAccessKey?: string;
     accessKeyId: string;
@@ -14,9 +15,10 @@ export declare class ChainOps {
     getEndpoint(endpointName: string): string;
     subscribe(subConfig: any): Promise<any>;
     unsubscribe(subscriptionId: string): Promise<any>;
+    listSubs(filter: watcher.IListFilter): Promise<any[]>;
     getBlockNumberFromTimestamp(ts: number): Promise<any>;
     getBlockNumberFromIso(isoString: string): Promise<any>;
-    warmBlockNumberFromTimestampCache(timezone: string): Promise<any[]>;
+    warmBlockNumberFromTimestampCache(timezone?: string): Promise<any[]>;
     getCreds(): Promise<ICred>;
     getIsLambdaExecution(): boolean;
 }
