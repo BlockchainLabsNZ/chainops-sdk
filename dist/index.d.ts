@@ -6,6 +6,9 @@ export interface ICred {
     accessKeyId: string;
     sessionToken: string | undefined;
 }
+export interface EthAddress {
+    address: string;
+}
 export declare class ChainOps {
     awsConfig: Config;
     config: IConfig;
@@ -13,6 +16,8 @@ export declare class ChainOps {
     constructor(env: string | IConfig);
     getGasPrice(blockNumber?: number): Promise<any>;
     getEndpoint(endpointName: string): string;
+    getOptimisticBalance(wallet: EthAddress, tokenContract: EthAddress): Promise<any>;
+    logOptimisticPending(executionId: string, tokenContract: EthAddress, senderAddress: EthAddress, tokenAmount: string): Promise<any>;
     subscribe(subConfig: any): Promise<any>;
     unsubscribe(subscriptionId: string): Promise<any>;
     listSubs(filter: watcher.IListFilter): Promise<any[]>;

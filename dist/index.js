@@ -53,6 +53,36 @@ class ChainOps {
         // @ts-ignore
         return this.config[endpointName];
     }
+    getOptimisticBalance(wallet, tokenContract) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!wallet) {
+                throw new Error('wallet is required');
+            }
+            if (!tokenContract) {
+                throw new Error('tokenContract is required');
+            }
+            const creds = yield this.getCreds();
+            return watcher.getOptimisticBalance(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, wallet, tokenContract);
+        });
+    }
+    logOptimisticPending(executionId, tokenContract, senderAddress, tokenAmount) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!executionId) {
+                throw new Error('executionId is required');
+            }
+            if (!tokenContract) {
+                throw new Error('tokenContract is required');
+            }
+            if (!senderAddress) {
+                throw new Error('senderAddress is required');
+            }
+            if (!tokenAmount) {
+                throw new Error('tokenAmount is required');
+            }
+            const creds = yield this.getCreds();
+            return watcher.logOptimisticPending(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, executionId, tokenContract, senderAddress, tokenAmount);
+        });
+    }
     subscribe(subConfig) {
         return __awaiter(this, void 0, void 0, function* () {
             const creds = yield this.getCreds();

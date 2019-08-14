@@ -13,6 +13,10 @@ export interface ICred {
   sessionToken: string | undefined
 }
 
+export interface EthAddress {
+  address: string
+}
+
 export class ChainOps {
   awsConfig: Config
   config: IConfig
@@ -45,6 +49,48 @@ export class ChainOps {
 
     // @ts-ignore
     return this.config[endpointName]
+  }
+
+  async getOptimisticBalance (wallet: EthAddress, tokenContract: EthAddress) {
+    if (!wallet) {
+      throw new Error('wallet is required')
+    }
+    if (!tokenContract) {
+      throw new Error('tokenContract is required')
+    }
+    const creds = await this.getCreds()
+
+    return watcher.getOptimisticBalance(
+      this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'),
+      creds,
+      wallet,
+      tokenContract
+    )
+  }
+
+  async logOptimisticPending (executionId: string, tokenContract: EthAddress, senderAddress: EthAddress, tokenAmount: string) {
+    if (!executionId) {
+      throw new Error('executionId is required')
+    }
+    if (!tokenContract) {
+      throw new Error('tokenContract is required')
+    }
+    if (!senderAddress) {
+      throw new Error('senderAddress is required')
+    }
+    if (!tokenAmount) {
+      throw new Error('tokenAmount is required')
+    }
+    const creds = await this.getCreds()
+
+    return watcher.logOptimisticPending(
+      this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'),
+      creds,
+      executionId,
+      tokenContract,
+      senderAddress,
+      tokenAmount
+    )
   }
 
   async subscribe (subConfig: any) {

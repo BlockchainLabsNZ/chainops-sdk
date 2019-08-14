@@ -44,6 +44,69 @@ function subscribe(endpoint, creds, subConfig) {
     });
 }
 exports.subscribe = subscribe;
+function getOptimisticBalance(endpoint, creds, wallet, tokenContract) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const url = new url_1.URL(`${endpoint}/optimistic/balance/${tokenContract}/${wallet}`);
+        const request = aws4_1.default.sign({
+            host: url.host,
+            url: url.href,
+            method: 'GET',
+            path: `${url.pathname}${url.search}`,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }, creds);
+        const reqConfig = {
+            method: request.method,
+            url: request.url,
+            headers: request.headers
+        };
+        try {
+            const response = yield axios_1.default.request(reqConfig);
+            return response.data;
+        }
+        catch (err) {
+            console.error('Error getting optimistic balance', err);
+            throw err;
+        }
+    });
+}
+exports.getOptimisticBalance = getOptimisticBalance;
+function logOptimisticPending(endpoint, creds, executionId, tokenContract, senderAddress, tokenAmount) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const url = new url_1.URL(`${endpoint}/optimistic/tx`);
+        const txConfig = {
+            executionId,
+            contract: tokenContract,
+            address: senderAddress,
+            value: tokenAmount
+        };
+        const request = aws4_1.default.sign({
+            host: url.host,
+            url: url.href,
+            method: 'POST',
+            path: `${url.pathname}${url.search}`,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(txConfig)
+        }, creds);
+        const reqConfig = {
+            method: request.method,
+            url: request.url,
+            headers: request.headers
+        };
+        try {
+            const response = yield axios_1.default.request(reqConfig);
+            return response.data;
+        }
+        catch (err) {
+            console.error('Error sending pending optimistic tx', err);
+            throw err;
+        }
+    });
+}
+exports.logOptimisticPending = logOptimisticPending;
 function listSubs(endpoint, creds, filter = {}) {
     return __awaiter(this, void 0, void 0, function* () {
         const url = new url_1.URL(endpoint + '/subscription');

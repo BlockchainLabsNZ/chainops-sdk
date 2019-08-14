@@ -9,7 +9,7 @@
     "build": "tsc",
     "standard": "standard src/**/*.ts",
     "standard-fix": "standard src/**/*.ts --fix",
-    "precommit": "lint-staged && npm test"
+    "precommit": "npm run standard && lint-staged && npm test"
   },
   "author": "",
   "license": "",
@@ -40,8 +40,9 @@
     }
   },
   "lint-staged": {
-    "*.ts": [
-      "standard --fix"
+    "src/**/*.ts": [
+      "standard --fix",
+      "git add"
     ]
   },
   "files": [
@@ -51,6 +52,11 @@
     "parser": "@typescript-eslint/parser",
     "plugins": [
       "@typescript-eslint/eslint-plugin"
+    ],
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended"
     ],
     "env": [
       "jest"

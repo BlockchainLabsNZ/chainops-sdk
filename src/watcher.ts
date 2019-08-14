@@ -1,6 +1,7 @@
 import aws4 from 'aws4'
 import axios from 'axios'
 import { URL } from 'url'
+import { EthAddress, ICred } from './index' // eslint-disable-line no-unused-vars
 
 export async function subscribe (endpoint: string, creds: any, subConfig: any) {
   const url = new URL(endpoint + '/subscription')
@@ -31,6 +32,76 @@ export async function subscribe (endpoint: string, creds: any, subConfig: any) {
     return response.data
   } catch (err) {
     console.error('Error subscribing', err)
+    throw err
+  }
+}
+
+export async function getOptimisticBalance (endpoint: string, creds: ICred, wallet: EthAddress, tokenContract: EthAddress) {
+  const url = new URL(`${endpoint}/optimistic/balance/${tokenContract}/${wallet}`)
+
+  const request = aws4.sign(
+    {
+      host: url.host,
+      url: url.href,
+      method: 'GET',
+      path: `${url.pathname}${url.search}`,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    },
+    creds
+  )
+
+  const reqConfig = {
+    method: request.method,
+    url: request.url,
+    headers: request.headers
+  }
+
+  try {
+    const response = await axios.request(reqConfig)
+    return response.data
+  } catch (err) {
+    console.error('Error getting optimistic balance', err)
+    throw err
+  }
+}
+
+export async function logOptimisticPending (endpoint: string, creds: ICred, executionId: string, tokenContract: EthAddress, senderAddress: EthAddress, tokenAmount: string) {
+  const url = new URL(`${endpoint}/optimistic/tx`)
+
+  const txConfig = {
+    executionId,
+    contract: tokenContract,
+    address: senderAddress,
+    value: tokenAmount
+  }
+
+  const request = aws4.sign(
+    {
+      host: url.host,
+      url: url.href,
+      method: 'POST',
+      path: `${url.pathname}${url.search}`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(txConfig)
+    },
+    creds
+  )
+
+  const reqConfig = {
+    method: request.method,
+    url: request.url,
+    headers: request.headers
+  }
+
+  try {
+    const response = await axios.request(reqConfig)
+    return response.data
+  } catch (err) {
+    console.error('Error sending pending optimistic tx', err)
     throw err
   }
 }
