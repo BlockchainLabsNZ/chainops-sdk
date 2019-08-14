@@ -65,6 +65,14 @@ e.g. TS_TO_BLOCKNUMBER can be '' or undefined, calling getBlockNumberFromTimesta
 
 See tests for usage
 
+## Tests
+
+Run tests with
+
+`npm test`
+
+Make sure the ChainOps URLs are up to date inside of `src/config.ts`
+
 ## Debug Mode
 
 set env var CHAINOPS_SDK_DEBUG=true
