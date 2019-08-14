@@ -5,38 +5,64 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "jest --coverage",
+    "test": "npm run build && jest --coverage",
     "build": "tsc",
-    "standard": "standard src/**/*.ts",
-    "standard-fix": "standard src/**/*.ts --fix"
+    "standard": "standard src/**/*.ts && npm run standard-tests",
+    "standard-tests": "standard tests/**/*.js",
+    "standard-tests-fix": "standard tests/**/*.js --fix",
+    "standard-fix": "standard src/**/*.ts --fix",
+    "precommit": "npm run standard && lint-staged && npm test"
   },
   "author": "",
   "license": "",
   "devDependencies": {
     "@types/aws4": "^1.5.1",
     "@types/moment": "^2.13.0",
-    "@types/moment-timezone": "^0.5.10",
-    "@types/node": "^10.12.12",
-    "eslint-plugin-typescript": "^0.14.0",
+    "@types/moment-timezone": "^0.5.12",
+    "@types/node": "^10.14.15",
+    "@typescript-eslint/eslint-plugin": "^2.0.0",
+    "@typescript-eslint/eslint-plugin-tslint": "^2.0.0",
+    "@typescript-eslint/parser": "^2.0.0",
+    "husky": "^3.0.3",
+    "lint-staged": "^9.2.1",
     "standard": "^12.0.1",
-    "typescript": "^3.2.1",
-    "typescript-eslint-parser": "^21.0.2"
+    "typescript": "^3.5.3"
   },
   "dependencies": {
-    "aws-sdk": "^2.368.0",
+    "aws-sdk": "^2.509.0",
     "aws4": "^1.8.0",
-    "axios": "^0.18.0",
-    "jest": "^23.6.0",
+    "axios": "^0.18.1",
+    "jest": "^24.8.0",
     "moment": "^2.24.0",
-    "moment-timezone": "^0.5.23"
+    "moment-timezone": "^0.5.26"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run precommit"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.ts": [
+      "standard --fix",
+      "git add"
+    ],
+    "tests/**/*.js": [
+      "standard --fix",
+      "git add"
+    ]
   },
   "files": [
     "dist/*"
   ],
   "standard": {
-    "parser": "typescript-eslint-parser",
+    "parser": "@typescript-eslint/parser",
     "plugins": [
-      "typescript"
+      "@typescript-eslint/eslint-plugin"
+    ],
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended"
     ],
     "env": [
       "jest"

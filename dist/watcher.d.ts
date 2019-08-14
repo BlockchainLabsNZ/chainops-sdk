@@ -1,4 +1,7 @@
+import { EthAddress, ICred } from './index';
 export declare function subscribe(endpoint: string, creds: any, subConfig: any): Promise<any>;
+export declare function getOptimisticBalance(endpoint: string, creds: ICred, wallet: EthAddress, tokenContract: EthAddress): Promise<any>;
+export declare function logOptimisticPending(endpoint: string, creds: ICred, executionId: string, tokenContract: EthAddress, senderAddress: EthAddress, tokenAmount: string): Promise<any>;
 export interface IListFilter {
     webhookContains?: string;
     webhookEquals?: string;

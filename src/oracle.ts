@@ -1,7 +1,7 @@
 import { isDebugMode } from './utils'
 import axios from 'axios'
 
-export async function getGasPrice(endpoint: string, blockNumber?: number) {
+export async function getGasPrice (endpoint: string, blockNumber?: number) {
   const file = `${blockNumber || 'latest'}.json`
   const config = {
     baseURL: endpoint,

@@ -7,6 +7,20 @@ const { ChainOps } = require('../dist/index')
 describe('ChainOps Watcher API', () => {
   let subscriptionId
 
+  // tests cant pass until endpoint exists
+  // it('should query optimistic balance', async () => {
+  //   const chainOps = new ChainOps('mainnet')
+
+  //   const balance = await chainOps.getOptimisticBalance(
+  //     "0x4370bc956e4f793e32a248b7ae0fe8969def8a1f",
+  //     "0xdd6bf56ca2ada24c683fac50e37783e55b57af9f"
+  //   )
+
+  //   expect(typeof balance).toBe('string')
+
+  //   console.log('Successfully queried balance', balance)
+  // })
+
   it('should make a subscription', async () => {
     const chainOps = new ChainOps('kovan')
 

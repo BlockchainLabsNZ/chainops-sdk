@@ -4,7 +4,7 @@ import aws4 from 'aws4'
 import moment from 'moment-timezone'
 import { URL } from 'url'
 
-function getTimestampsToCache(timezone: string) {
+function getTimestampsToCache (timezone: string) {
   const ts: number[] = []
 
   const iterateDate = moment()
@@ -19,7 +19,7 @@ function getTimestampsToCache(timezone: string) {
   return ts
 }
 
-export async function warmBlockNumberFromTimestampCache(
+export async function warmBlockNumberFromTimestampCache (
   endpoint: string,
   creds: any,
   tz: string
@@ -36,7 +36,7 @@ export async function warmBlockNumberFromTimestampCache(
   return Promise.all(actions)
 }
 
-export async function getBlockNumberFromTimestamp(
+export async function getBlockNumberFromTimestamp (
   endpoint: string,
   creds: any,
   ts: number
@@ -45,7 +45,7 @@ export async function getBlockNumberFromTimestamp(
   return callEndpoint(url, creds)
 }
 
-export async function getBlockNumberFromIso(
+export async function getBlockNumberFromIso (
   endpoint: string,
   creds: any,
   iso: string
@@ -54,7 +54,7 @@ export async function getBlockNumberFromIso(
   return callEndpoint(url, creds)
 }
 
-async function callEndpoint(url: URL, creds: any) {
+async function callEndpoint (url: URL, creds: any) {
   const request = aws4.sign(
     {
       host: url.host,
