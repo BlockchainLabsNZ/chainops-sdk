@@ -7,7 +7,9 @@
   "scripts": {
     "test": "npm run build && jest --coverage",
     "build": "tsc",
-    "standard": "standard src/**/*.ts",
+    "standard": "standard src/**/*.ts && npm run standard-tests",
+    "standard-tests": "standard tests/**/*.js",
+    "standard-tests-fix": "standard tests/**/*.js --fix",
     "standard-fix": "standard src/**/*.ts --fix",
     "precommit": "npm run standard && lint-staged && npm test"
   },
@@ -41,6 +43,10 @@
   },
   "lint-staged": {
     "src/**/*.ts": [
+      "standard --fix",
+      "git add"
+    ],
+    "tests/**/*.js": [
       "standard --fix",
       "git add"
     ]

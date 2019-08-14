@@ -24,7 +24,7 @@ describe('ChainOps Timestamp BlockNumber API', () => {
   })
 
   it('should warm the cache by timezone', async () => {
-    jest.setTimeout(30 * 24 * 1000) //allow 30 secs for 24months in milliseconds
+    jest.setTimeout(30 * 24 * 1000) // allow 30 secs for 24months in milliseconds
     const chainOps = new ChainOps('kovan')
 
     await chainOps.warmBlockNumberFromTimestampCache(

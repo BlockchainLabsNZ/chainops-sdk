@@ -4,7 +4,7 @@
 
 const { ChainOps } = require('../dist/index')
 
-describe.only('ChainOps Watcher API', () => {
+describe('ChainOps Watcher API', () => {
   let subscriptionId
 
   // tests cant pass until endpoint exists
