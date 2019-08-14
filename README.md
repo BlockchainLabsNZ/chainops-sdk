@@ -34,9 +34,14 @@ e.g. TS_TO_BLOCKNUMBER can be '' or undefined, calling getBlockNumberFromTimesta
 ```typescript
     getGasPrice(blockNumber?: number): Promise<any>
 
+    // Watcher methods
+    // https://github.com/BlockchainLabsNZ/chainops-watcher
     subscribe(subConfig: any): Promise<any>
     unsubscribe(subscriptionId: string): Promise<any>
-
+    // More info on Optimstic balances:
+    // https://github.com/BlockchainLabsNZ/chainops-watcher/blob/feature/optimistic/OptimisticBalances.md
+    getOptimisticBalance(wallet: EthAddress, tokenContract: EthAddress): Promise<string>
+    logOptimisticPending(executionId: string, tokenContract: EthAddress, senderAddress: EthAddress, tokenAmount: string)
     listSubs(filter?): Promise<ISubscription[]>
     Filter {
         webhookContains?: string

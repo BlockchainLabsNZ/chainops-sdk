@@ -37,6 +37,10 @@ export class ChainOps {
     }
   }
 
+  /**
+   * Query for the gas price of a particular block
+   * @param blockNumber The block number you are interested in
+   */
   async getGasPrice (blockNumber?: number) {
     return oracle.getGasPrice(this.getEndpoint('ORACLE_URL'), blockNumber)
   }
@@ -51,7 +55,13 @@ export class ChainOps {
     return this.config[endpointName]
   }
 
-  async getOptimisticBalance (wallet: EthAddress, tokenContract: EthAddress) {
+  /**
+   * Query the watcher for the optimistic balance for an address
+   * https://github.com/BlockchainLabsNZ/chainops-watcher/blob/feature/optimistic/OptimisticBalances.md
+   * @param wallet The address you'd like the balance of
+   * @param tokenContract The token balance you're interested in
+   */
+  async getOptimisticBalance (wallet: EthAddress, tokenContract: EthAddress): Promise<string> {
     if (!wallet) {
       throw new Error('wallet is required')
     }
@@ -68,7 +78,14 @@ export class ChainOps {
     )
   }
 
-  async logOptimisticPending (executionId: string, tokenContract: EthAddress, senderAddress: EthAddress, tokenAmount: string) {
+  /**
+   * Let the watcher know about a new pending token transfer
+   * @param executionId The ChainOps Execution ID for the transfer
+   * @param tokenContract The contract for the tokens being transferred
+   * @param senderAddress The sender of the tokens
+   * @param tokenAmount The amount of tokens being sent
+   */
+  async logOptimisticPending (executionId: string, tokenContract: EthAddress, senderAddress: EthAddress, tokenAmount: string): Promise<void> {
     if (!executionId) {
       throw new Error('executionId is required')
     }
@@ -93,6 +110,10 @@ export class ChainOps {
     )
   }
 
+  /**
+   * Create a new watcher subscription
+   * @param subConfig Configuration for your new subscription
+   */
   async subscribe (subConfig: any) {
     const creds = await this.getCreds()
 
@@ -103,6 +124,10 @@ export class ChainOps {
     )
   }
 
+  /**
+   * Destroy an existing watcher subscription
+   * @param subscriptionId The ID you'd like to destroy
+   */
   async unsubscribe (subscriptionId: string) {
     const creds = await this.getCreds()
 
@@ -113,6 +138,10 @@ export class ChainOps {
     )
   }
 
+  /**
+   * Get a list of existing subscriptions
+   * @param filter Filter which subscriptions you get back
+   */
   async listSubs (filter: watcher.IListFilter) {
     const creds = await this.getCreds()
 
@@ -123,6 +152,10 @@ export class ChainOps {
     )
   }
 
+  /**
+   * Query for a block number based on a timestamp
+   * @param ts Timestamp you'd like to know the block number of
+   */
   async getBlockNumberFromTimestamp (ts: number) {
     const creds = await this.getCreds()
 
@@ -133,6 +166,10 @@ export class ChainOps {
     )
   }
 
+  /**
+   * Query for the block number based on an isostring
+   * @param isoString ISOString you'd like to know the block number of
+   */
   async getBlockNumberFromIso (isoString: string) {
     const creds = await this.getCreds()
 
