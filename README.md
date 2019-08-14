@@ -29,6 +29,36 @@ const chainOps = new ChainOps({
 Config endpoints can be missing, however at runtime they will throw an error for that particular functionality
 e.g. TS_TO_BLOCKNUMBER can be '' or undefined, calling getBlockNumberFromTimestamp will throw error
 
+## Quickstart
+
+- Edit your `serverless.yml` file and allow your lambda to invoke the ChainOps SDK
+
+```yml
+# Allow Lambdas to invoke the ChainOps SDK
+- Effect: Allow
+    Action:
+    - execute-api:Invoke
+    Resource:
+    - arn:aws:execute-api:*:${self:provider.environment.CHAINOPS_AWS_ACC}:*/*/*/*
+```
+
+- Create a new ChainOps instance
+
+```js
+const chainOps = new ChainOps('mainnet')
+```
+
+- Query a ChainOps endpoint
+
+```js
+const result = await chainOps.listSubs({})
+```
+
+*Troubleshooting*
+
+- If your lambda is using a custom authorizer then check that it doesn't override the `execute-api:invoke` rule you set, or disable the custom authorizer
+- Check you are using the correct AWS Account ID for the Chainops instance you wish to target
+
 ## Chainops class methods
 
 ```typescript
