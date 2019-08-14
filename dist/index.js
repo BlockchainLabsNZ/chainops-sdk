@@ -40,6 +40,10 @@ class ChainOps {
             this.config = env;
         }
     }
+    /**
+     * Query for the gas price of a particular block
+     * @param blockNumber The block number you are interested in
+     */
     getGasPrice(blockNumber) {
         return __awaiter(this, void 0, void 0, function* () {
             return oracle.getGasPrice(this.getEndpoint('ORACLE_URL'), blockNumber);
@@ -53,6 +57,12 @@ class ChainOps {
         // @ts-ignore
         return this.config[endpointName];
     }
+    /**
+     * Query the watcher for the optimistic balance for an address
+     * https://github.com/BlockchainLabsNZ/chainops-watcher/blob/feature/optimistic/OptimisticBalances.md
+     * @param wallet The address you'd like the balance of
+     * @param tokenContract The token balance you're interested in
+     */
     getOptimisticBalance(wallet, tokenContract) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!wallet) {
@@ -65,6 +75,13 @@ class ChainOps {
             return watcher.getOptimisticBalance(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, wallet, tokenContract);
         });
     }
+    /**
+     * Let the watcher know about a new pending token transfer
+     * @param executionId The ChainOps Execution ID for the transfer
+     * @param tokenContract The contract for the tokens being transferred
+     * @param senderAddress The sender of the tokens
+     * @param tokenAmount The amount of tokens being sent
+     */
     logOptimisticPending(executionId, tokenContract, senderAddress, tokenAmount) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!executionId) {
@@ -83,30 +100,50 @@ class ChainOps {
             return watcher.logOptimisticPending(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, executionId, tokenContract, senderAddress, tokenAmount);
         });
     }
+    /**
+     * Create a new watcher subscription
+     * @param subConfig Configuration for your new subscription
+     */
     subscribe(subConfig) {
         return __awaiter(this, void 0, void 0, function* () {
             const creds = yield this.getCreds();
             return watcher.subscribe(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, subConfig);
         });
     }
+    /**
+     * Destroy an existing watcher subscription
+     * @param subscriptionId The ID you'd like to destroy
+     */
     unsubscribe(subscriptionId) {
         return __awaiter(this, void 0, void 0, function* () {
             const creds = yield this.getCreds();
             return watcher.unsubscribe(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, subscriptionId);
         });
     }
+    /**
+     * Get a list of existing subscriptions
+     * @param filter Filter which subscriptions you get back
+     */
     listSubs(filter) {
         return __awaiter(this, void 0, void 0, function* () {
             const creds = yield this.getCreds();
             return watcher.listSubs(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, filter);
         });
     }
+    /**
+     * Query for a block number based on a timestamp
+     * @param ts Timestamp you'd like to know the block number of
+     */
     getBlockNumberFromTimestamp(ts) {
         return __awaiter(this, void 0, void 0, function* () {
             const creds = yield this.getCreds();
             return tsToBlocknumber.getBlockNumberFromTimestamp(this.getEndpoint('TS_TO_BLOCKNUMBER'), creds, ts);
         });
     }
+    /**
+     * Query for the block number based on an isostring
+     * @param isoString ISOString you'd like to know the block number of
+     */
     getBlockNumberFromIso(isoString) {
         return __awaiter(this, void 0, void 0, function* () {
             const creds = yield this.getCreds();
