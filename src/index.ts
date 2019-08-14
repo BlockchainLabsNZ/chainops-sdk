@@ -1,6 +1,6 @@
 import { SharedIniFileCredentials, Config } from 'aws-sdk'
 
-import config, { IConfig } from './config'
+import config, { IConfig } from './config' // eslint-disable-line no-unused-vars
 import { isDebugMode } from './utils'
 
 import * as watcher from './watcher'
@@ -18,12 +18,11 @@ export class ChainOps {
   config: IConfig
   isLambdaExecution: boolean
 
-  constructor(env: string | IConfig) {
+  constructor (env: string | IConfig) {
     this.awsConfig = new Config()
     this.isLambdaExecution = this.getIsLambdaExecution()
 
-    if (!this.isLambdaExecution)
-      this.awsConfig.credentials = new SharedIniFileCredentials()
+    if (!this.isLambdaExecution) { this.awsConfig.credentials = new SharedIniFileCredentials() }
 
     if (typeof env === 'string') {
       console.log('Setting config from env:', env)
@@ -34,21 +33,21 @@ export class ChainOps {
     }
   }
 
-  async getGasPrice(blockNumber?: number) {
+  async getGasPrice (blockNumber?: number) {
     return oracle.getGasPrice(this.getEndpoint('ORACLE_URL'), blockNumber)
   }
 
-  getEndpoint(endpointName: string): string {
-    //@ts-ignore
+  getEndpoint (endpointName: string): string {
+    // @ts-ignore
     if (!this.config[endpointName] || this.config[endpointName].length === 0) {
       throw new Error(endpointName + ' endpoint not defined')
     }
 
-    //@ts-ignore
+    // @ts-ignore
     return this.config[endpointName]
   }
 
-  async subscribe(subConfig: any) {
+  async subscribe (subConfig: any) {
     const creds = await this.getCreds()
 
     return watcher.subscribe(
@@ -58,7 +57,7 @@ export class ChainOps {
     )
   }
 
-  async unsubscribe(subscriptionId: string) {
+  async unsubscribe (subscriptionId: string) {
     const creds = await this.getCreds()
 
     return watcher.unsubscribe(
@@ -68,7 +67,7 @@ export class ChainOps {
     )
   }
 
-  async listSubs(filter: watcher.IListFilter) {
+  async listSubs (filter: watcher.IListFilter) {
     const creds = await this.getCreds()
 
     return watcher.listSubs(
@@ -78,7 +77,7 @@ export class ChainOps {
     )
   }
 
-  async getBlockNumberFromTimestamp(ts: number) {
+  async getBlockNumberFromTimestamp (ts: number) {
     const creds = await this.getCreds()
 
     return tsToBlocknumber.getBlockNumberFromTimestamp(
@@ -88,7 +87,7 @@ export class ChainOps {
     )
   }
 
-  async getBlockNumberFromIso(isoString: string) {
+  async getBlockNumberFromIso (isoString: string) {
     const creds = await this.getCreds()
 
     return tsToBlocknumber.getBlockNumberFromIso(
@@ -98,8 +97,8 @@ export class ChainOps {
     )
   }
 
-  //makes the calls to precache the last 24 months
-  async warmBlockNumberFromTimestampCache(timezone: string = 'Etc/UTC') {
+  // makes the calls to precache the last 24 months
+  async warmBlockNumberFromTimestampCache (timezone: string = 'Etc/UTC') {
     const creds = await this.getCreds()
 
     return tsToBlocknumber.warmBlockNumberFromTimestampCache(
@@ -109,7 +108,7 @@ export class ChainOps {
     )
   }
 
-  async getCreds() {
+  async getCreds () {
     if (isDebugMode()) console.log('AWS Creds', this.awsConfig.credentials)
     if (!this.awsConfig.credentials) throw new Error('AWS creds not set')
 
@@ -127,7 +126,7 @@ export class ChainOps {
     return creds
   }
 
-  getIsLambdaExecution() {
+  getIsLambdaExecution () {
     const env = process.env.AWS_LAMBDA_FUNCTION_NAME
     return !!(env && env.length > 0)
   }

@@ -2,7 +2,7 @@ import aws4 from 'aws4'
 import axios from 'axios'
 import { URL } from 'url'
 
-export async function subscribe(endpoint: string, creds: any, subConfig: any) {
+export async function subscribe (endpoint: string, creds: any, subConfig: any) {
   const url = new URL(endpoint + '/subscription')
 
   const request = aws4.sign(
@@ -47,7 +47,7 @@ export interface IListFilter {
   filterTopicContains?: string
 }
 
-export async function listSubs(
+export async function listSubs (
   endpoint: string,
   creds: any,
   filter: IListFilter = {}
@@ -83,7 +83,7 @@ export async function listSubs(
   }
 }
 
-export async function unsubscribe(endpoint: string, creds: any, subId: string) {
+export async function unsubscribe (endpoint: string, creds: any, subId: string) {
   const url = new URL(endpoint + '/subscription/' + subId)
 
   const request = aws4.sign(
@@ -114,7 +114,7 @@ export async function unsubscribe(endpoint: string, creds: any, subId: string) {
   }
 }
 
-export function filterSubs(subs: any[], filter: IListFilter) {
+export function filterSubs (subs: any[], filter: IListFilter) {
   const contains = (
     test: string | string[] | undefined,
     matchString: string
@@ -127,8 +127,7 @@ export function filterSubs(subs: any[], filter: IListFilter) {
 
     // is string array
     for (let i = 0; i < test.length; i++) {
-      if (test[i].toLowerCase().indexOf(matchString.toLowerCase()) > -1)
-        return true
+      if (test[i].toLowerCase().indexOf(matchString.toLowerCase()) > -1) { return true }
     }
 
     return false
@@ -136,8 +135,7 @@ export function filterSubs(subs: any[], filter: IListFilter) {
 
   const equals = (test: string | string[] | undefined, matchString: string) => {
     if (!test) return false
-    if (typeof test === 'string')
-      return test.toLowerCase() === matchString.toLowerCase()
+    if (typeof test === 'string') { return test.toLowerCase() === matchString.toLowerCase() }
 
     // is string array
     for (let i = 0; i < test.length; i++) {
@@ -148,49 +146,41 @@ export function filterSubs(subs: any[], filter: IListFilter) {
   }
 
   return subs.filter(sub => {
-    if (filter.webhookEquals && !equals(sub.webhook, filter.webhookEquals))
-      return false
+    if (filter.webhookEquals && !equals(sub.webhook, filter.webhookEquals)) { return false }
 
     if (
       filter.webhookContains &&
       !contains(sub.webhook, filter.webhookContains)
-    )
-      return false
+    ) { return false }
 
     if (filter.nameEquals && !equals(sub.name, filter.nameEquals)) return false
 
-    if (filter.nameContains && !contains(sub.name, filter.nameContains))
-      return false
+    if (filter.nameContains && !contains(sub.name, filter.nameContains)) { return false }
 
     if (
       filter.filterContains &&
       !contains(JSON.stringify(sub.filter), filter.filterContains)
-    )
-      return false
+    ) { return false }
 
     if (
       filter.filterLogAddressContains &&
       !contains(sub.filter.logAddress, filter.filterLogAddressContains)
-    )
-      return false
+    ) { return false }
 
     if (
       filter.filterTopicContains &&
       !contains(sub.filter.topic, filter.filterTopicContains)
-    )
-      return false
+    ) { return false }
 
     if (
       filter.filterFromContains &&
       !contains(sub.filter.addressFrom, filter.filterFromContains)
-    )
-      return false
+    ) { return false }
 
     if (
       filter.filterToContains &&
       !contains(sub.filter.addressTo, filter.filterToContains)
-    )
-      return false
+    ) { return false }
 
     return true
   })

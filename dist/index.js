@@ -19,7 +19,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const aws_sdk_1 = require("aws-sdk");
-const config_1 = __importDefault(require("./config"));
+const config_1 = __importDefault(require("./config")); // eslint-disable-line no-unused-vars
 const utils_1 = require("./utils");
 const watcher = __importStar(require("./watcher"));
 const oracle = __importStar(require("./oracle"));
@@ -28,8 +28,9 @@ class ChainOps {
     constructor(env) {
         this.awsConfig = new aws_sdk_1.Config();
         this.isLambdaExecution = this.getIsLambdaExecution();
-        if (!this.isLambdaExecution)
+        if (!this.isLambdaExecution) {
             this.awsConfig.credentials = new aws_sdk_1.SharedIniFileCredentials();
+        }
         if (typeof env === 'string') {
             console.log('Setting config from env:', env);
             this.config = config_1.default[env];
@@ -45,11 +46,11 @@ class ChainOps {
         });
     }
     getEndpoint(endpointName) {
-        //@ts-ignore
+        // @ts-ignore
         if (!this.config[endpointName] || this.config[endpointName].length === 0) {
             throw new Error(endpointName + ' endpoint not defined');
         }
-        //@ts-ignore
+        // @ts-ignore
         return this.config[endpointName];
     }
     subscribe(subConfig) {
@@ -82,7 +83,7 @@ class ChainOps {
             return tsToBlocknumber.getBlockNumberFromIso(this.getEndpoint('TS_TO_BLOCKNUMBER'), creds, isoString);
         });
     }
-    //makes the calls to precache the last 24 months
+    // makes the calls to precache the last 24 months
     warmBlockNumberFromTimestampCache(timezone = 'Etc/UTC') {
         return __awaiter(this, void 0, void 0, function* () {
             const creds = yield this.getCreds();
