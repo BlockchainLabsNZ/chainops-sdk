@@ -94,7 +94,8 @@ export async function logOptimisticPending (endpoint: string, creds: ICred, exec
   const reqConfig = {
     method: request.method,
     url: request.url,
-    headers: request.headers
+    headers: request.headers,
+    data: JSON.stringify(txConfig)
   }
 
   try {

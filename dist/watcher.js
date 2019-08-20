@@ -94,7 +94,8 @@ function logOptimisticPending(endpoint, creds, executionId, tokenContract, sende
         const reqConfig = {
             method: request.method,
             url: request.url,
-            headers: request.headers
+            headers: request.headers,
+            data: JSON.stringify(txConfig)
         };
         try {
             const response = yield axios_1.default.request(reqConfig);
