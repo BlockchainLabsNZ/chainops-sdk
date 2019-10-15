@@ -111,6 +111,18 @@ export class ChainOps {
   }
 
   /**
+   * Get the version of the deployed watcher
+   */
+  async watcherVersion () {
+    const creds = await this.getCreds()
+
+    return watcher.version(
+      this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'),
+      creds
+    )
+  }
+
+  /**
    * Create a new watcher subscription
    * @param subConfig Configuration for your new subscription
    */

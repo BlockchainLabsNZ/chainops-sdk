@@ -101,6 +101,15 @@ class ChainOps {
         });
     }
     /**
+     * Get the version of the deployed watcher
+     */
+    watcherVersion() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const creds = yield this.getCreds();
+            return watcher.version(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds);
+        });
+    }
+    /**
      * Create a new watcher subscription
      * @param subConfig Configuration for your new subscription
      */

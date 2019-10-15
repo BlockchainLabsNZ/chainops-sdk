@@ -36,6 +36,10 @@ export declare class ChainOps {
      */
     logOptimisticPending(executionId: string, tokenContract: EthAddress, senderAddress: EthAddress, tokenAmount: string): Promise<void>;
     /**
+     * Get the version of the deployed watcher
+     */
+    watcherVersion(): Promise<any>;
+    /**
      * Create a new watcher subscription
      * @param subConfig Configuration for your new subscription
      */

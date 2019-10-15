@@ -40,6 +40,15 @@ describe('ChainOps Watcher API', () => {
     console.log('Successfully created sub', subscriptionId)
   })
 
+  it('should return version', async () => {
+    const chainOps = new ChainOps('mainnet')
+
+    const version = await chainOps.watcherVersion()
+    expect(Object.keys(version)).toContain('version')
+
+    console.log('Got version', version)
+  })
+
   it('should list subscriptions', async () => {
     const chainOps = new ChainOps('kovan')
 
