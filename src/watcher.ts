@@ -3,6 +3,37 @@ import axios from 'axios'
 import { URL } from 'url'
 import { EthAddress, ICred } from './index' // eslint-disable-line no-unused-vars
 
+export async function version (endpoint: string, creds: ICred) {
+  const url = new URL(endpoint + '/version')
+
+  const request = aws4.sign(
+    {
+      host: url.host,
+      url: url.href,
+      method: 'GET',
+      path: `${url.pathname}${url.search}`,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    },
+    creds
+  )
+
+  const reqConfig = {
+    method: request.method,
+    url: request.url,
+    headers: request.headers
+  }
+
+  try {
+    const response = await axios.request(reqConfig)
+    return response.data
+  } catch (err) {
+    console.error('Error getting version', err)
+    throw err
+  }
+}
+
 export async function subscribe (endpoint: string, creds: any, subConfig: any) {
   const url = new URL(endpoint + '/subscription')
 

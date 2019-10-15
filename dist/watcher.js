@@ -14,6 +14,34 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const aws4_1 = __importDefault(require("aws4"));
 const axios_1 = __importDefault(require("axios"));
 const url_1 = require("url");
+function version(endpoint, creds) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const url = new url_1.URL(endpoint + '/version');
+        const request = aws4_1.default.sign({
+            host: url.host,
+            url: url.href,
+            method: 'GET',
+            path: `${url.pathname}${url.search}`,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }, creds);
+        const reqConfig = {
+            method: request.method,
+            url: request.url,
+            headers: request.headers
+        };
+        try {
+            const response = yield axios_1.default.request(reqConfig);
+            return response.data;
+        }
+        catch (err) {
+            console.error('Error getting version', err);
+            throw err;
+        }
+    });
+}
+exports.version = version;
 function subscribe(endpoint, creds, subConfig) {
     return __awaiter(this, void 0, void 0, function* () {
         const url = new url_1.URL(endpoint + '/subscription');

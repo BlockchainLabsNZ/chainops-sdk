@@ -96,6 +96,10 @@ const result = await chainOps.listSubs({})
     }>
 
     warmBlockNumberFromTimestampCache(timezone: string): Promise<void>
+
+    watcherVersion(): Promise<{
+        version: string
+    }>
 ```
 
 See tests for usage
