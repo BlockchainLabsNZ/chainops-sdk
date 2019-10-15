@@ -10,8 +10,7 @@
     "standard": "standard src/**/*.ts && npm run standard-tests",
     "standard-tests": "standard tests/**/*.js",
     "standard-tests-fix": "standard tests/**/*.js --fix",
-    "standard-fix": "standard src/**/*.ts --fix",
-    "precommit": "npm run standard && lint-staged && npm test"
+    "standard-fix": "standard src/**/*.ts --fix"
   },
   "author": "",
   "license": "",
@@ -35,11 +34,6 @@
     "jest": "^24.8.0",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.26"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run precommit"
-    }
   },
   "lint-staged": {
     "src/**/*.ts": [
@@ -71,5 +65,10 @@
   "prettier": {
     "semi": false,
     "singleQuote": true
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run standard && lint-staged && npm test"
+    }
   }
 }
