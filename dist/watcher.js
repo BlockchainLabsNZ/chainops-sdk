@@ -100,14 +100,15 @@ function getOptimisticBalance(endpoint, creds, wallet, tokenContract) {
     });
 }
 exports.getOptimisticBalance = getOptimisticBalance;
-function logOptimisticPending(endpoint, creds, executionId, tokenContract, senderAddress, tokenAmount) {
+function logOptimisticPending(endpoint, creds, executionId, tokenContract, senderAddress, tokenAmount, onFailure) {
     return __awaiter(this, void 0, void 0, function* () {
         const url = new url_1.URL(`${endpoint}/optimistic/tx`);
         const txConfig = {
             executionId,
             contract: tokenContract,
             address: senderAddress,
-            value: tokenAmount
+            value: tokenAmount,
+            onFailure
         };
         const request = aws4_1.default.sign({
             host: url.host,
