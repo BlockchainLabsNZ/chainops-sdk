@@ -22,7 +22,7 @@ describe('ChainOps Watcher API', () => {
   // })
 
   it('should make a subscription', async () => {
-    const chainOps = new ChainOps('kovan')
+    const chainOps = new ChainOps('mainnet')
 
     const subscription = await chainOps.subscribe({
       webhook: 'https://example.com',
@@ -50,16 +50,16 @@ describe('ChainOps Watcher API', () => {
   })
 
   it('should list subscriptions', async () => {
-    const chainOps = new ChainOps('kovan')
+    const chainOps = new ChainOps('mainnet')
 
     const subscriptions = await chainOps.listSubs()
     expect(subscriptions.length).toBeGreaterThan(0)
 
-    console.log('Successfully listed subs', subscriptions)
+    console.log('Successfully listed subs', subscriptions.length)
   })
 
   it('should unsubscribe', async () => {
-    const chainOps = new ChainOps('kovan')
+    const chainOps = new ChainOps('mainnet')
     await chainOps.unsubscribe(subscriptionId)
     console.log('Successfully unsubscribed from sub', subscriptionId)
   })

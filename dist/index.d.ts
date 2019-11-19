@@ -33,8 +33,9 @@ export declare class ChainOps {
      * @param tokenContract The contract for the tokens being transferred
      * @param senderAddress The sender of the tokens
      * @param tokenAmount The amount of tokens being sent
+     * @param onFailure The failure policy to use
      */
-    logOptimisticPending(executionId: string, tokenContract: EthAddress, senderAddress: EthAddress, tokenAmount: string): Promise<void>;
+    logOptimisticPending(executionId: string, tokenContract: EthAddress, senderAddress: EthAddress, tokenAmount: string, onFailure: string): Promise<void>;
     /**
      * Get the version of the deployed watcher
      */
