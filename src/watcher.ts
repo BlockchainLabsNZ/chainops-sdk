@@ -3,7 +3,7 @@ import axios from 'axios'
 import { URL } from 'url'
 import { EthAddress, ICred } from './index' // eslint-disable-line no-unused-vars
 
-export async function version(endpoint: string, creds: ICred) {
+export async function version (endpoint: string, creds: ICred) {
   const url = new URL(endpoint + '/version')
 
   const request = aws4.sign(
@@ -34,7 +34,7 @@ export async function version(endpoint: string, creds: ICred) {
   }
 }
 
-export async function subscribe(endpoint: string, creds: any, subConfig: any) {
+export async function subscribe (endpoint: string, creds: any, subConfig: any) {
   const url = new URL(endpoint + '/subscription')
 
   const request = aws4.sign(
@@ -67,7 +67,7 @@ export async function subscribe(endpoint: string, creds: any, subConfig: any) {
   }
 }
 
-export async function getOptimisticBalance(
+export async function getOptimisticBalance (
   endpoint: string,
   creds: ICred,
   wallet: EthAddress,
@@ -105,7 +105,7 @@ export async function getOptimisticBalance(
   }
 }
 
-export async function logOptimisticPending(
+export async function logOptimisticPending (
   endpoint: string,
   creds: ICred,
   executionId: string,
@@ -166,7 +166,7 @@ export interface IListFilter {
   filterTopicContains?: string
 }
 
-export async function listSubs(
+export async function listSubs (
   endpoint: string,
   creds: any,
   filter: IListFilter = {}
@@ -202,7 +202,7 @@ export async function listSubs(
   }
 }
 
-export async function unsubscribe(endpoint: string, creds: any, subId: string) {
+export async function unsubscribe (endpoint: string, creds: any, subId: string) {
   const url = new URL(endpoint + '/subscription/' + subId)
 
   const request = aws4.sign(
@@ -233,7 +233,71 @@ export async function unsubscribe(endpoint: string, creds: any, subId: string) {
   }
 }
 
-export function filterSubs(subs: any[], filter: IListFilter) {
+export async function testAddressAgainstPendingBloom (
+  endpoint: string,
+  creds: any,
+  address: string
+) {
+  const url = new URL(endpoint + '/subscription/pending/address/' + address)
+
+  const request = aws4.sign(
+    {
+      host: url.host,
+      url: url.href,
+      method: 'GET',
+      path: `${url.pathname}${url.search}`
+    },
+    creds
+  )
+
+  const reqConfig = {
+    method: request.method,
+    url: request.url,
+    headers: request.headers
+  }
+
+  try {
+    const response = await axios.request(reqConfig)
+    return response.data
+  } catch (err) {
+    console.error('Error adding address to pending bloom', err)
+    throw err
+  }
+}
+
+export async function addAddressToPendingBloom (
+  endpoint: string,
+  creds: any,
+  address: string
+) {
+  const url = new URL(endpoint + '/subscription/pending/address/' + address)
+
+  const request = aws4.sign(
+    {
+      host: url.host,
+      url: url.href,
+      method: 'PUT',
+      path: `${url.pathname}${url.search}`
+    },
+    creds
+  )
+
+  const reqConfig = {
+    method: request.method,
+    url: request.url,
+    headers: request.headers
+  }
+
+  try {
+    const response = await axios.request(reqConfig)
+    return response.data
+  } catch (err) {
+    console.error('Error adding address to pending bloom', err)
+    throw err
+  }
+}
+
+export function filterSubs (subs: any[], filter: IListFilter) {
   const contains = (
     test: string | string[] | undefined,
     matchString: string

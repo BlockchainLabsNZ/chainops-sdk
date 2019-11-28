@@ -141,6 +141,26 @@ class ChainOps {
         });
     }
     /**
+     * Makes a call to watcher logging the address to the bloom
+     * @param address string of address e.g. 0x123
+     */
+    addAddressToPendingBloom(address) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const creds = yield this.getCreds();
+            return watcher.addAddressToPendingBloom(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, address);
+        });
+    }
+    /**
+     * Checks if the address satisfies the bloom
+     * @param address string of address e.g. 0x123
+     */
+    testAddressAgainstPendingBloom(address) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const creds = yield this.getCreds();
+            return watcher.testAddressAgainstPendingBloom(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, address);
+        });
+    }
+    /**
      * Query for a block number based on a timestamp
      * @param ts Timestamp you'd like to know the block number of
      */

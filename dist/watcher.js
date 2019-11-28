@@ -194,6 +194,56 @@ function unsubscribe(endpoint, creds, subId) {
     });
 }
 exports.unsubscribe = unsubscribe;
+function testAddressAgainstPendingBloom(endpoint, creds, address) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const url = new url_1.URL(endpoint + '/subscription/pending/address/' + address);
+        const request = aws4_1.default.sign({
+            host: url.host,
+            url: url.href,
+            method: 'GET',
+            path: `${url.pathname}${url.search}`
+        }, creds);
+        const reqConfig = {
+            method: request.method,
+            url: request.url,
+            headers: request.headers
+        };
+        try {
+            const response = yield axios_1.default.request(reqConfig);
+            return response.data;
+        }
+        catch (err) {
+            console.error('Error adding address to pending bloom', err);
+            throw err;
+        }
+    });
+}
+exports.testAddressAgainstPendingBloom = testAddressAgainstPendingBloom;
+function addAddressToPendingBloom(endpoint, creds, address) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const url = new url_1.URL(endpoint + '/subscription/pending/address/' + address);
+        const request = aws4_1.default.sign({
+            host: url.host,
+            url: url.href,
+            method: 'PUT',
+            path: `${url.pathname}${url.search}`
+        }, creds);
+        const reqConfig = {
+            method: request.method,
+            url: request.url,
+            headers: request.headers
+        };
+        try {
+            const response = yield axios_1.default.request(reqConfig);
+            return response.data;
+        }
+        catch (err) {
+            console.error('Error adding address to pending bloom', err);
+            throw err;
+        }
+    });
+}
+exports.addAddressToPendingBloom = addAddressToPendingBloom;
 function filterSubs(subs, filter) {
     const contains = (test, matchString) => {
         if (!test)

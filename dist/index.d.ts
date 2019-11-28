@@ -56,6 +56,16 @@ export declare class ChainOps {
      */
     listSubs(filter: watcher.IListFilter): Promise<any[]>;
     /**
+     * Makes a call to watcher logging the address to the bloom
+     * @param address string of address e.g. 0x123
+     */
+    addAddressToPendingBloom(address: string): Promise<any>;
+    /**
+     * Checks if the address satisfies the bloom
+     * @param address string of address e.g. 0x123
+     */
+    testAddressAgainstPendingBloom(address: string): Promise<any>;
+    /**
      * Query for a block number based on a timestamp
      * @param ts Timestamp you'd like to know the block number of
      */
