@@ -3,7 +3,7 @@ import axios from 'axios'
 import { URL } from 'url'
 import { EthAddress, ICred } from './index' // eslint-disable-line no-unused-vars
 
-export async function version (endpoint: string, creds: ICred) {
+export async function version(endpoint: string, creds: ICred) {
   const url = new URL(endpoint + '/version')
 
   const request = aws4.sign(
@@ -34,7 +34,7 @@ export async function version (endpoint: string, creds: ICred) {
   }
 }
 
-export async function subscribe (endpoint: string, creds: any, subConfig: any) {
+export async function subscribe(endpoint: string, creds: any, subConfig: any) {
   const url = new URL(endpoint + '/subscription')
 
   const request = aws4.sign(
@@ -67,7 +67,7 @@ export async function subscribe (endpoint: string, creds: any, subConfig: any) {
   }
 }
 
-export async function getOptimisticBalance (
+export async function getOptimisticBalance(
   endpoint: string,
   creds: ICred,
   wallet: EthAddress,
@@ -105,14 +105,15 @@ export async function getOptimisticBalance (
   }
 }
 
-export async function logOptimisticPending (
+export async function logOptimisticPending(
   endpoint: string,
   creds: ICred,
   executionId: string,
   tokenContract: EthAddress,
   senderAddress: EthAddress,
   tokenAmount: string,
-  onFailure: string
+  onFailure: string,
+  ttl: number | null = null
 ) {
   const url = new URL(`${endpoint}/optimistic/tx`)
 
@@ -121,7 +122,8 @@ export async function logOptimisticPending (
     contract: tokenContract,
     address: senderAddress,
     value: tokenAmount,
-    onFailure
+    onFailure,
+    ttl
   }
 
   const request = aws4.sign(
@@ -166,7 +168,7 @@ export interface IListFilter {
   filterTopicContains?: string
 }
 
-export async function listSubs (
+export async function listSubs(
   endpoint: string,
   creds: any,
   filter: IListFilter = {}
@@ -202,7 +204,7 @@ export async function listSubs (
   }
 }
 
-export async function unsubscribe (endpoint: string, creds: any, subId: string) {
+export async function unsubscribe(endpoint: string, creds: any, subId: string) {
   const url = new URL(endpoint + '/subscription/' + subId)
 
   const request = aws4.sign(
@@ -233,7 +235,7 @@ export async function unsubscribe (endpoint: string, creds: any, subId: string) 
   }
 }
 
-export async function testAddressAgainstPendingBloom (
+export async function testAddressAgainstPendingBloom(
   endpoint: string,
   creds: any,
   address: string
@@ -265,7 +267,7 @@ export async function testAddressAgainstPendingBloom (
   }
 }
 
-export async function addAddressToPendingBloom (
+export async function addAddressToPendingBloom(
   endpoint: string,
   creds: any,
   address: string
@@ -297,7 +299,7 @@ export async function addAddressToPendingBloom (
   }
 }
 
-export function filterSubs (subs: any[], filter: IListFilter) {
+export function filterSubs(subs: any[], filter: IListFilter) {
   const contains = (
     test: string | string[] | undefined,
     matchString: string

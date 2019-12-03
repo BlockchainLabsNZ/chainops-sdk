@@ -83,7 +83,7 @@ class ChainOps {
      * @param tokenAmount The amount of tokens being sent
      * @param onFailure The failure policy to use
      */
-    logOptimisticPending(executionId, tokenContract, senderAddress, tokenAmount, onFailure) {
+    logOptimisticPending(executionId, tokenContract, senderAddress, tokenAmount, onFailure, ttl = null) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!executionId) {
                 throw new Error('executionId is required');
@@ -98,7 +98,7 @@ class ChainOps {
                 throw new Error('tokenAmount is required');
             }
             const creds = yield this.getCreds();
-            return watcher.logOptimisticPending(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, executionId, tokenContract, senderAddress, tokenAmount, onFailure);
+            return watcher.logOptimisticPending(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, executionId, tokenContract, senderAddress, tokenAmount, onFailure, ttl);
         });
     }
     /**
