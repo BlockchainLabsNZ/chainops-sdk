@@ -35,7 +35,7 @@ export declare class ChainOps {
      * @param tokenAmount The amount of tokens being sent
      * @param onFailure The failure policy to use
      */
-    logOptimisticPending(executionId: string, tokenContract: EthAddress, senderAddress: EthAddress, tokenAmount: string, onFailure: string, ttl?: number | null): Promise<void>;
+    logOptimisticPending(executionId: string, tokenContract: EthAddress, senderAddress: EthAddress, tokenAmount: string, onFailure: string, reason?: string, ttl?: number | null): Promise<void>;
     /**
      * Get the version of the deployed watcher
      */
