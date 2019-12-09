@@ -83,7 +83,7 @@ class ChainOps {
      * @param tokenAmount The amount of tokens being sent
      * @param onFailure The failure policy to use
      */
-    logOptimisticPending(executionId, tokenContract, senderAddress, tokenAmount, onFailure) {
+    logOptimisticPending(executionId, tokenContract, senderAddress, tokenAmount, onFailure, reason = '', ttl = null) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!executionId) {
                 throw new Error('executionId is required');
@@ -98,7 +98,7 @@ class ChainOps {
                 throw new Error('tokenAmount is required');
             }
             const creds = yield this.getCreds();
-            return watcher.logOptimisticPending(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, executionId, tokenContract, senderAddress, tokenAmount, onFailure);
+            return watcher.logOptimisticPending(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, executionId, tokenContract, senderAddress, tokenAmount, onFailure, reason, ttl);
         });
     }
     /**
@@ -138,6 +138,33 @@ class ChainOps {
         return __awaiter(this, void 0, void 0, function* () {
             const creds = yield this.getCreds();
             return watcher.listSubs(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, filter);
+        });
+    }
+    /**
+     * Makes a call to watcher logging the address to the filter
+     * This filter currently (subject to change) uses a bloom filter
+     * under the hood. The consumer should do further checks to see
+     * whether it satisfies
+     * @param address string of address e.g. 0x123
+     * @returns object response data
+     */
+    addAddressToPendingFilter(address) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const creds = yield this.getCreds();
+            return watcher.addAddressToPendingFilter(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, address);
+        });
+    }
+    /**
+     * Checks if the address satisfies the filter
+     * This can result in false-positives as it currently
+     * (subject to change) uses a bloom filter
+     * @param address string of address e.g. 0x123
+     * @returns object response data
+     */
+    testAddressAgainstPendingFilter(address) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const creds = yield this.getCreds();
+            return watcher.testAddressAgainstPendingFilter(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, address);
         });
     }
     /**

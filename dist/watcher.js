@@ -100,7 +100,7 @@ function getOptimisticBalance(endpoint, creds, wallet, tokenContract) {
     });
 }
 exports.getOptimisticBalance = getOptimisticBalance;
-function logOptimisticPending(endpoint, creds, executionId, tokenContract, senderAddress, tokenAmount, onFailure) {
+function logOptimisticPending(endpoint, creds, executionId, tokenContract, senderAddress, tokenAmount, onFailure, reason = '', ttl = null) {
     return __awaiter(this, void 0, void 0, function* () {
         const url = new url_1.URL(`${endpoint}/optimistic/tx`);
         const txConfig = {
@@ -108,7 +108,9 @@ function logOptimisticPending(endpoint, creds, executionId, tokenContract, sende
             contract: tokenContract,
             address: senderAddress,
             value: tokenAmount,
-            onFailure
+            onFailure,
+            ttl,
+            reason
         };
         const request = aws4_1.default.sign({
             host: url.host,
@@ -194,6 +196,56 @@ function unsubscribe(endpoint, creds, subId) {
     });
 }
 exports.unsubscribe = unsubscribe;
+function testAddressAgainstPendingFilter(endpoint, creds, address) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const url = new url_1.URL(endpoint + '/subscription/pending/address/' + address);
+        const request = aws4_1.default.sign({
+            host: url.host,
+            url: url.href,
+            method: 'GET',
+            path: `${url.pathname}${url.search}`
+        }, creds);
+        const reqConfig = {
+            method: request.method,
+            url: request.url,
+            headers: request.headers
+        };
+        try {
+            const response = yield axios_1.default.request(reqConfig);
+            return response.data;
+        }
+        catch (err) {
+            console.error('Error testing address against pending bloom', err);
+            throw err;
+        }
+    });
+}
+exports.testAddressAgainstPendingFilter = testAddressAgainstPendingFilter;
+function addAddressToPendingFilter(endpoint, creds, address) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const url = new url_1.URL(endpoint + '/subscription/pending/address/' + address);
+        const request = aws4_1.default.sign({
+            host: url.host,
+            url: url.href,
+            method: 'PUT',
+            path: `${url.pathname}${url.search}`
+        }, creds);
+        const reqConfig = {
+            method: request.method,
+            url: request.url,
+            headers: request.headers
+        };
+        try {
+            const response = yield axios_1.default.request(reqConfig);
+            return response.data;
+        }
+        catch (err) {
+            console.error('Error adding address to pending bloom', err);
+            throw err;
+        }
+    });
+}
+exports.addAddressToPendingFilter = addAddressToPendingFilter;
 function filterSubs(subs, filter) {
     const contains = (test, matchString) => {
         if (!test)

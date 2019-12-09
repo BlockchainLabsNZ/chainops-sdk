@@ -35,7 +35,7 @@ export declare class ChainOps {
      * @param tokenAmount The amount of tokens being sent
      * @param onFailure The failure policy to use
      */
-    logOptimisticPending(executionId: string, tokenContract: EthAddress, senderAddress: EthAddress, tokenAmount: string, onFailure: string): Promise<void>;
+    logOptimisticPending(executionId: string, tokenContract: EthAddress, senderAddress: EthAddress, tokenAmount: string, onFailure: string, reason?: string, ttl?: number | null): Promise<void>;
     /**
      * Get the version of the deployed watcher
      */
@@ -55,6 +55,23 @@ export declare class ChainOps {
      * @param filter Filter which subscriptions you get back
      */
     listSubs(filter: watcher.IListFilter): Promise<any[]>;
+    /**
+     * Makes a call to watcher logging the address to the filter
+     * This filter currently (subject to change) uses a bloom filter
+     * under the hood. The consumer should do further checks to see
+     * whether it satisfies
+     * @param address string of address e.g. 0x123
+     * @returns object response data
+     */
+    addAddressToPendingFilter(address: string): Promise<any>;
+    /**
+     * Checks if the address satisfies the filter
+     * This can result in false-positives as it currently
+     * (subject to change) uses a bloom filter
+     * @param address string of address e.g. 0x123
+     * @returns object response data
+     */
+    testAddressAgainstPendingFilter(address: string): Promise<any>;
     /**
      * Query for a block number based on a timestamp
      * @param ts Timestamp you'd like to know the block number of

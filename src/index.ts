@@ -22,7 +22,7 @@ export class ChainOps {
   config: IConfig
   isLambdaExecution: boolean
 
-  constructor(env: string | IConfig) {
+  constructor (env: string | IConfig) {
     this.awsConfig = new Config()
     this.isLambdaExecution = this.getIsLambdaExecution()
 
@@ -43,11 +43,11 @@ export class ChainOps {
    * Query for the gas price of a particular block
    * @param blockNumber The block number you are interested in
    */
-  async getGasPrice(blockNumber?: number) {
+  async getGasPrice (blockNumber?: number) {
     return oracle.getGasPrice(this.getEndpoint('ORACLE_URL'), blockNumber)
   }
 
-  getEndpoint(endpointName: string): string {
+  getEndpoint (endpointName: string): string {
     // @ts-ignore
     if (!this.config[endpointName] || this.config[endpointName].length === 0) {
       throw new Error(endpointName + ' endpoint not defined')
@@ -63,7 +63,7 @@ export class ChainOps {
    * @param wallet The address you'd like the balance of
    * @param tokenContract The token balance you're interested in
    */
-  async getOptimisticBalance(
+  async getOptimisticBalance (
     wallet: EthAddress,
     tokenContract: EthAddress
   ): Promise<string> {
@@ -91,12 +91,14 @@ export class ChainOps {
    * @param tokenAmount The amount of tokens being sent
    * @param onFailure The failure policy to use
    */
-  async logOptimisticPending(
+  async logOptimisticPending (
     executionId: string,
     tokenContract: EthAddress,
     senderAddress: EthAddress,
     tokenAmount: string,
-    onFailure: string
+    onFailure: string,
+    reason: string = '',
+    ttl: number | null = null
   ): Promise<void> {
     if (!executionId) {
       throw new Error('executionId is required')
@@ -119,14 +121,16 @@ export class ChainOps {
       tokenContract,
       senderAddress,
       tokenAmount,
-      onFailure
+      onFailure,
+      reason,
+      ttl
     )
   }
 
   /**
    * Get the version of the deployed watcher
    */
-  async watcherVersion() {
+  async watcherVersion () {
     const creds = await this.getCreds()
 
     return watcher.version(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds)
@@ -136,7 +140,7 @@ export class ChainOps {
    * Create a new watcher subscription
    * @param subConfig Configuration for your new subscription
    */
-  async subscribe(subConfig: any) {
+  async subscribe (subConfig: any) {
     const creds = await this.getCreds()
 
     return watcher.subscribe(
@@ -150,7 +154,7 @@ export class ChainOps {
    * Destroy an existing watcher subscription
    * @param subscriptionId The ID you'd like to destroy
    */
-  async unsubscribe(subscriptionId: string) {
+  async unsubscribe (subscriptionId: string) {
     const creds = await this.getCreds()
 
     return watcher.unsubscribe(
@@ -164,7 +168,7 @@ export class ChainOps {
    * Get a list of existing subscriptions
    * @param filter Filter which subscriptions you get back
    */
-  async listSubs(filter: watcher.IListFilter) {
+  async listSubs (filter: watcher.IListFilter) {
     const creds = await this.getCreds()
 
     return watcher.listSubs(
@@ -175,10 +179,45 @@ export class ChainOps {
   }
 
   /**
+   * Makes a call to watcher logging the address to the filter
+   * This filter currently (subject to change) uses a bloom filter
+   * under the hood. The consumer should do further checks to see
+   * whether it satisfies
+   * @param address string of address e.g. 0x123
+   * @returns object response data
+   */
+  async addAddressToPendingFilter (address: string) {
+    const creds = await this.getCreds()
+
+    return watcher.addAddressToPendingFilter(
+      this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'),
+      creds,
+      address
+    )
+  }
+
+  /**
+   * Checks if the address satisfies the filter
+   * This can result in false-positives as it currently
+   * (subject to change) uses a bloom filter
+   * @param address string of address e.g. 0x123
+   * @returns object response data
+   */
+  async testAddressAgainstPendingFilter (address: string) {
+    const creds = await this.getCreds()
+
+    return watcher.testAddressAgainstPendingFilter(
+      this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'),
+      creds,
+      address
+    )
+  }
+
+  /**
    * Query for a block number based on a timestamp
    * @param ts Timestamp you'd like to know the block number of
    */
-  async getBlockNumberFromTimestamp(ts: number) {
+  async getBlockNumberFromTimestamp (ts: number) {
     const creds = await this.getCreds()
 
     return tsToBlocknumber.getBlockNumberFromTimestamp(
@@ -192,7 +231,7 @@ export class ChainOps {
    * Query for the block number based on an isostring
    * @param isoString ISOString you'd like to know the block number of
    */
-  async getBlockNumberFromIso(isoString: string) {
+  async getBlockNumberFromIso (isoString: string) {
     const creds = await this.getCreds()
 
     return tsToBlocknumber.getBlockNumberFromIso(
@@ -203,7 +242,7 @@ export class ChainOps {
   }
 
   // makes the calls to precache the last 24 months
-  async warmBlockNumberFromTimestampCache(timezone: string = 'Etc/UTC') {
+  async warmBlockNumberFromTimestampCache (timezone: string = 'Etc/UTC') {
     const creds = await this.getCreds()
 
     return tsToBlocknumber.warmBlockNumberFromTimestampCache(
@@ -213,7 +252,7 @@ export class ChainOps {
     )
   }
 
-  async getCreds() {
+  async getCreds () {
     if (isDebugMode()) console.log('AWS Creds', this.awsConfig.credentials)
     if (!this.awsConfig.credentials) throw new Error('AWS creds not set')
 
@@ -231,7 +270,7 @@ export class ChainOps {
     return creds
   }
 
-  getIsLambdaExecution() {
+  getIsLambdaExecution () {
     const env = process.env.AWS_LAMBDA_FUNCTION_NAME
     return !!(env && env.length > 0)
   }

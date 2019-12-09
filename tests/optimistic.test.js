@@ -15,13 +15,15 @@ describe('Optimistic', () => {
       '0x123',
       '0x456',
       '20',
-      'INCLUDE_IN_BALANCE'
+      'INCLUDE_IN_BALANCE',
+      '',
+      null
     )
 
     expect(spy).toHaveBeenCalledWith(
       expect.objectContaining({
         data:
-          '{"executionId":"abc","contract":"0x123","address":"0x456","value":"20","onFailure":"INCLUDE_IN_BALANCE"}'
+          '{"executionId":"abc","contract":"0x123","address":"0x456","value":"20","onFailure":"INCLUDE_IN_BALANCE","ttl":null,"reason":""}'
       })
     )
   })
