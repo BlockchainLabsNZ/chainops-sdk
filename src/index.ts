@@ -181,6 +181,7 @@ export class ChainOps {
   /**
    * Makes a call to watcher logging the address to the bloom
    * @param address string of address e.g. 0x123
+   * @returns object response data
    */
   async addAddressToPendingBloom (address: string) {
     const creds = await this.getCreds()

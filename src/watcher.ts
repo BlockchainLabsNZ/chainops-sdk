@@ -264,7 +264,7 @@ export async function testAddressAgainstPendingBloom (
     const response = await axios.request(reqConfig)
     return response.data
   } catch (err) {
-    console.error('Error adding address to pending bloom', err)
+    console.error('Error testing address against pending bloom', err)
     throw err
   }
 }
