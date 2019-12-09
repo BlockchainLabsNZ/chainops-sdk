@@ -141,23 +141,30 @@ class ChainOps {
         });
     }
     /**
-     * Makes a call to watcher logging the address to the bloom
+     * Makes a call to watcher logging the address to the filter
+     * This filter currently (subject to change) uses a bloom filter
+     * under the hood. The consumer should do further checks to see
+     * whether it satisfies
      * @param address string of address e.g. 0x123
+     * @returns object response data
      */
-    addAddressToPendingBloom(address) {
+    addAddressToPendingFilter(address) {
         return __awaiter(this, void 0, void 0, function* () {
             const creds = yield this.getCreds();
-            return watcher.addAddressToPendingBloom(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, address);
+            return watcher.addAddressToPendingFilter(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, address);
         });
     }
     /**
-     * Checks if the address satisfies the bloom
+     * Checks if the address satisfies the filter
+     * This can result in false-positives as it currently
+     * (subject to change) uses a bloom filter
      * @param address string of address e.g. 0x123
+     * @returns object response data
      */
-    testAddressAgainstPendingBloom(address) {
+    testAddressAgainstPendingFilter(address) {
         return __awaiter(this, void 0, void 0, function* () {
             const creds = yield this.getCreds();
-            return watcher.testAddressAgainstPendingBloom(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, address);
+            return watcher.testAddressAgainstPendingFilter(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, address);
         });
     }
     /**

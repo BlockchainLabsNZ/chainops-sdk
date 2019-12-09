@@ -237,7 +237,7 @@ export async function unsubscribe (endpoint: string, creds: any, subId: string) 
   }
 }
 
-export async function testAddressAgainstPendingBloom (
+export async function testAddressAgainstPendingFilter (
   endpoint: string,
   creds: any,
   address: string
@@ -269,7 +269,7 @@ export async function testAddressAgainstPendingBloom (
   }
 }
 
-export async function addAddressToPendingBloom (
+export async function addAddressToPendingFilter (
   endpoint: string,
   creds: any,
   address: string

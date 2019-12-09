@@ -56,15 +56,22 @@ export declare class ChainOps {
      */
     listSubs(filter: watcher.IListFilter): Promise<any[]>;
     /**
-     * Makes a call to watcher logging the address to the bloom
+     * Makes a call to watcher logging the address to the filter
+     * This filter currently (subject to change) uses a bloom filter
+     * under the hood. The consumer should do further checks to see
+     * whether it satisfies
      * @param address string of address e.g. 0x123
+     * @returns object response data
      */
-    addAddressToPendingBloom(address: string): Promise<any>;
+    addAddressToPendingFilter(address: string): Promise<any>;
     /**
-     * Checks if the address satisfies the bloom
+     * Checks if the address satisfies the filter
+     * This can result in false-positives as it currently
+     * (subject to change) uses a bloom filter
      * @param address string of address e.g. 0x123
+     * @returns object response data
      */
-    testAddressAgainstPendingBloom(address: string): Promise<any>;
+    testAddressAgainstPendingFilter(address: string): Promise<any>;
     /**
      * Query for a block number based on a timestamp
      * @param ts Timestamp you'd like to know the block number of

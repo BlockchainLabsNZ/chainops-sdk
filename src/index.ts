@@ -179,14 +179,17 @@ export class ChainOps {
   }
 
   /**
-   * Makes a call to watcher logging the address to the bloom
+   * Makes a call to watcher logging the address to the filter
+   * This filter currently (subject to change) uses a bloom filter
+   * under the hood. The consumer should do further checks to see
+   * whether it satisfies
    * @param address string of address e.g. 0x123
    * @returns object response data
    */
-  async addAddressToPendingBloom (address: string) {
+  async addAddressToPendingFilter (address: string) {
     const creds = await this.getCreds()
 
-    return watcher.addAddressToPendingBloom(
+    return watcher.addAddressToPendingFilter(
       this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'),
       creds,
       address
@@ -194,13 +197,16 @@ export class ChainOps {
   }
 
   /**
-   * Checks if the address satisfies the bloom
+   * Checks if the address satisfies the filter
+   * This can result in false-positives as it currently
+   * (subject to change) uses a bloom filter
    * @param address string of address e.g. 0x123
+   * @returns object response data
    */
-  async testAddressAgainstPendingBloom (address: string) {
+  async testAddressAgainstPendingFilter (address: string) {
     const creds = await this.getCreds()
 
-    return watcher.testAddressAgainstPendingBloom(
+    return watcher.testAddressAgainstPendingFilter(
       this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'),
       creds,
       address

@@ -196,7 +196,7 @@ function unsubscribe(endpoint, creds, subId) {
     });
 }
 exports.unsubscribe = unsubscribe;
-function testAddressAgainstPendingBloom(endpoint, creds, address) {
+function testAddressAgainstPendingFilter(endpoint, creds, address) {
     return __awaiter(this, void 0, void 0, function* () {
         const url = new url_1.URL(endpoint + '/subscription/pending/address/' + address);
         const request = aws4_1.default.sign({
@@ -215,13 +215,13 @@ function testAddressAgainstPendingBloom(endpoint, creds, address) {
             return response.data;
         }
         catch (err) {
-            console.error('Error adding address to pending bloom', err);
+            console.error('Error testing address against pending bloom', err);
             throw err;
         }
     });
 }
-exports.testAddressAgainstPendingBloom = testAddressAgainstPendingBloom;
-function addAddressToPendingBloom(endpoint, creds, address) {
+exports.testAddressAgainstPendingFilter = testAddressAgainstPendingFilter;
+function addAddressToPendingFilter(endpoint, creds, address) {
     return __awaiter(this, void 0, void 0, function* () {
         const url = new url_1.URL(endpoint + '/subscription/pending/address/' + address);
         const request = aws4_1.default.sign({
@@ -245,7 +245,7 @@ function addAddressToPendingBloom(endpoint, creds, address) {
         }
     });
 }
-exports.addAddressToPendingBloom = addAddressToPendingBloom;
+exports.addAddressToPendingFilter = addAddressToPendingFilter;
 function filterSubs(subs, filter) {
     const contains = (test, matchString) => {
         if (!test)

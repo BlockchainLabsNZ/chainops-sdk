@@ -16,6 +16,6 @@ export interface IListFilter {
 }
 export declare function listSubs(endpoint: string, creds: any, filter?: IListFilter): Promise<any[]>;
 export declare function unsubscribe(endpoint: string, creds: any, subId: string): Promise<any>;
-export declare function testAddressAgainstPendingBloom(endpoint: string, creds: any, address: string): Promise<any>;
-export declare function addAddressToPendingBloom(endpoint: string, creds: any, address: string): Promise<any>;
+export declare function testAddressAgainstPendingFilter(endpoint: string, creds: any, address: string): Promise<any>;
+export declare function addAddressToPendingFilter(endpoint: string, creds: any, address: string): Promise<any>;
 export declare function filterSubs(subs: any[], filter: IListFilter): any[];

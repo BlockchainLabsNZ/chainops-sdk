@@ -1,7 +1,7 @@
 const axios = require('axios')
 const { ChainOps } = require('../dist/index')
 
-describe('Pending address bloom filter', () => {
+describe('Pending address filter', () => {
   it('should log an address', async () => {
     const spy = jest.fn().mockResolvedValue({
       data: 'hello'
@@ -10,7 +10,7 @@ describe('Pending address bloom filter', () => {
     axios.request = spy
 
     const chainops = new ChainOps('mainnet')
-    await chainops.addAddressToPendingBloom('0x123')
+    await chainops.addAddressToPendingFilter('0x123')
 
     expect(spy).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -28,7 +28,7 @@ describe('Pending address bloom filter', () => {
     axios.request = spy
 
     const chainops = new ChainOps('mainnet')
-    await chainops.testAddressAgainstPendingBloom('0x123')
+    await chainops.testAddressAgainstPendingFilter('0x123')
 
     expect(spy).toHaveBeenCalledWith(
       expect.objectContaining({
