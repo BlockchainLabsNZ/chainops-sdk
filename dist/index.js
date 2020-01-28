@@ -213,6 +213,12 @@ class ChainOps {
             return creds;
         });
     }
+    addAddressToBloom(subscriptionId, address) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const creds = yield this.getCreds();
+            return watcher.addAddressToBloom(this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'), creds, subscriptionId, address);
+        });
+    }
     getIsLambdaExecution() {
         const env = process.env.AWS_LAMBDA_FUNCTION_NAME;
         return !!(env && env.length > 0);

@@ -19,3 +19,4 @@ export declare function unsubscribe(endpoint: string, creds: any, subId: string)
 export declare function testAddressAgainstPendingFilter(endpoint: string, creds: any, address: string): Promise<any>;
 export declare function addAddressToPendingFilter(endpoint: string, creds: any, address: string): Promise<any>;
 export declare function filterSubs(subs: any[], filter: IListFilter): any[];
+export declare function addAddressToBloom(endpoint: string, creds: any, subId: string, address: string): Promise<any>;
