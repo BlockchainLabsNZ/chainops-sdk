@@ -339,3 +339,31 @@ function addAddressToBloom(endpoint, creds, subId, address) {
     });
 }
 exports.addAddressToBloom = addAddressToBloom;
+function testAddressAgainstBloom(endpoint, creds, subId, address) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const url = new url_1.URL(`${endpoint}/subscription/${subId}/bloom/${address}`);
+        const request = aws4_1.default.sign({
+            host: url.host,
+            url: url.href,
+            method: 'GET',
+            path: `${url.pathname}${url.search}`,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }, creds);
+        const reqConfig = {
+            method: request.method,
+            url: request.url,
+            headers: request.headers
+        };
+        try {
+            const response = yield axios_1.default.request(reqConfig);
+            return response.data;
+        }
+        catch (err) {
+            console.error('Error adding address to bloom', err);
+            throw err;
+        }
+    });
+}
+exports.testAddressAgainstBloom = testAddressAgainstBloom;
