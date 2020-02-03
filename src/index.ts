@@ -270,6 +270,28 @@ export class ChainOps {
     return creds
   }
 
+  async addAddressToBloom (subscriptionId: string, address: string) {
+    const creds = await this.getCreds()
+
+    return watcher.addAddressToBloom(
+      this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'),
+      creds,
+      subscriptionId,
+      address
+    )
+  }
+
+  async testAddressAgainstBloom (subscriptionId: string, address: string) {
+    const creds = await this.getCreds()
+
+    return watcher.testAddressAgainstBloom(
+      this.getEndpoint('SUBSCRIPTIONS_ENDPOINT'),
+      creds,
+      subscriptionId,
+      address
+    )
+  }
+
   getIsLambdaExecution () {
     const env = process.env.AWS_LAMBDA_FUNCTION_NAME
     return !!(env && env.length > 0)

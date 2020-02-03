@@ -84,5 +84,7 @@ export declare class ChainOps {
     getBlockNumberFromIso(isoString: string): Promise<any>;
     warmBlockNumberFromTimestampCache(timezone?: string): Promise<any[]>;
     getCreds(): Promise<ICred>;
+    addAddressToBloom(subscriptionId: string, address: string): Promise<any>;
+    testAddressAgainstBloom(subscriptionId: string, address: string): Promise<any>;
     getIsLambdaExecution(): boolean;
 }

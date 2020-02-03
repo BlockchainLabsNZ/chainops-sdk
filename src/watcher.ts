@@ -392,3 +392,75 @@ export function filterSubs (subs: any[], filter: IListFilter) {
     return true
   })
 }
+
+export async function addAddressToBloom (
+  endpoint: string,
+  creds: any,
+  subId: string,
+  address: string
+) {
+  const url = new URL(`${endpoint}/subscription/${subId}/bloom/${address}`)
+
+  const request = aws4.sign(
+    {
+      host: url.host,
+      url: url.href,
+      method: 'PUT',
+      path: `${url.pathname}${url.search}`,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    },
+    creds
+  )
+
+  const reqConfig = {
+    method: request.method,
+    url: request.url,
+    headers: request.headers
+  }
+
+  try {
+    const response = await axios.request(reqConfig)
+    return response.data
+  } catch (err) {
+    console.error('Error adding address to bloom', err)
+    throw err
+  }
+}
+
+export async function testAddressAgainstBloom (
+  endpoint: string,
+  creds: any,
+  subId: string,
+  address: string
+) {
+  const url = new URL(`${endpoint}/subscription/${subId}/bloom/${address}`)
+
+  const request = aws4.sign(
+    {
+      host: url.host,
+      url: url.href,
+      method: 'GET',
+      path: `${url.pathname}${url.search}`,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    },
+    creds
+  )
+
+  const reqConfig = {
+    method: request.method,
+    url: request.url,
+    headers: request.headers
+  }
+
+  try {
+    const response = await axios.request(reqConfig)
+    return response.data
+  } catch (err) {
+    console.error('Error adding address to bloom', err)
+    throw err
+  }
+}
