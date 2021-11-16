@@ -28,7 +28,7 @@
     "typescript": "^3.5.3"
   },
   "dependencies": {
-    "aws-sdk": "^2.509.0",
+    "aws-sdk": "^2.814.0",
     "aws4": "^1.8.0",
     "axios": "^0.18.1",
     "jest": "^24.8.0",
